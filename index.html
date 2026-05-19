@@ -670,6 +670,76 @@
                 app.render();
             },
 
+            async handleCatalogAdd() {
+                if (app.state.user?.role !== 'admin') {
+                    app.notify('Only admins can add catalog items', 'error');
+                    return;
+                }
+
+                const name = window.prompt('Item name');
+                if (!name) return;
+
+                const category = window.prompt('Category', 'General') || 'General';
+                const description = window.prompt('Description', '') || '';
+                const cost_price = parseFloat(window.prompt('Cost price', '0')) || 0;
+                const margin = parseInt(window.prompt('Margin (%)', '20'), 10) || 0;
+                const unit = window.prompt('Unit', 'unit') || 'unit';
+
+                const result = await API.catalog.create({ name, category, description, cost_price, margin, unit });
+                if (result.success) {
+                    app.notify('Catalog item added', 'success');
+                    app.loadAppData();
+                } else {
+                    app.notify(result.error || 'Failed to add item', 'error');
+                }
+            },
+
+            async handleCatalogEdit(itemId) {
+                if (app.state.user?.role !== 'admin') {
+                    app.notify('Only admins can edit catalog items', 'error');
+                    return;
+                }
+
+                const item = app.state.catalog.find(i => i.id === itemId);
+                if (!item) {
+                    app.notify('Catalog item not found', 'error');
+                    return;
+                }
+
+                const name = window.prompt('Item name', item.name) || item.name;
+                const category = window.prompt('Category', item.category) || item.category;
+                const description = window.prompt('Description', item.description || '') || item.description || '';
+                const cost_price = parseFloat(window.prompt('Cost price', item.cost_price)) || item.cost_price;
+                const margin = parseInt(window.prompt('Margin (%)', item.margin), 10) || item.margin;
+                const unit = window.prompt('Unit', item.unit) || item.unit;
+
+                const result = await API.catalog.update(itemId, { name, category, description, cost_price, margin, unit });
+                if (result.success) {
+                    app.notify('Catalog item updated', 'success');
+                    app.loadAppData();
+                } else {
+                    app.notify(result.error || 'Failed to update item', 'error');
+                }
+            },
+
+            async handleCatalogDelete(itemId) {
+                if (app.state.user?.role !== 'admin') {
+                    app.notify('Only admins can delete catalog items', 'error');
+                    return;
+                }
+
+                const confirmed = window.confirm('Delete this catalog item?');
+                if (!confirmed) return;
+
+                const result = await API.catalog.delete(itemId);
+                if (result.success) {
+                    app.notify('Catalog item deleted', 'success');
+                    app.loadAppData();
+                } else {
+                    app.notify(result.error || 'Failed to delete item', 'error');
+                }
+            },
+
             async loadAppData() {
                 const [company, catalog, clients, quotes, stats] = await Promise.all([
                     API.company.get(),
@@ -914,6 +984,24 @@
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', (e) => {
                         app.setView(e.currentTarget.dataset.view);
+                    });
+                });
+
+                // Catalog actions
+                const addBtn = document.querySelector('.catalog-add-btn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', app.handleCatalogAdd);
+                }
+
+                document.querySelectorAll('.catalog-edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleCatalogEdit(e.currentTarget.dataset.id);
+                    });
+                });
+
+                document.querySelectorAll('.catalog-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleCatalogDelete(e.currentTarget.dataset.id);
                     });
                 });
 
