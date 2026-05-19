@@ -2,7 +2,7 @@
 
 A comprehensive setup guide for deploying QuoteSystem PHP with database backend.
 
-## 🚀 Quick Start (5 minutes)
+##  Quick Start (5 minutes)
 
 ### 1. Extract Files
 ```bash
@@ -41,7 +41,7 @@ http://localhost/q/
 Default: admin@company.com / admin123
 ```
 
-## 📋 File Structure
+##  File Structure
 
 ```
 q/
@@ -85,7 +85,7 @@ Verify with:
 php -m | grep -E 'mysqli|json|openssl'
 ```
 
-## 🔐 Security Configuration
+##  Security Configuration
 
 ### Step 1: Generate Secret Keys
 ```php
@@ -139,7 +139,7 @@ chmod 644 /var/www/html/q/.htaccess
 </VirtualHost>
 ```
 
-## 📦 Folder Permissions Reference
+##  Folder Permissions Reference
 
 | Path | Permission | Owner | Purpose |
 |------|-----------|-------|---------|
@@ -151,7 +151,7 @@ chmod 644 /var/www/html/q/.htaccess
 | `*.php` | 644 | www-data | PHP files |
 | `.htaccess` | 644 | www-data | Apache config |
 
-## 🔄 Database Initialization
+##  Database Initialization
 
 The database tables are automatically created on first access to the API. However, you can manually initialize by:
 
@@ -171,7 +171,7 @@ echo "Tables created successfully!";
 ?>
 ```
 
-## 🧪 Testing the Setup
+##  Testing the Setup
 
 ### 1. Test Database Connection
 ```bash
@@ -207,7 +207,7 @@ fetch('/q/api/stats').then(r => r.json()).then(console.log)
 # Should return statistics JSON
 ```
 
-## 📱 Deployment Checklist
+##  Deployment Checklist
 
 ### Before Going Live
 
@@ -226,7 +226,7 @@ fetch('/q/api/stats').then(r => r.json()).then(console.log)
 - [ ] Document any customizations
 - [ ] Test database restore process
 
-## 🆘 Troubleshooting
+##  Troubleshooting
 
 ### Issue: "Database connection failed"
 
@@ -297,7 +297,7 @@ fetch('/q/api/stats').then(r => r.json()).then(console.log)
 - [ ] Performance optimization
 - [ ] User account cleanup
 
-## 📊 Performance Optimization
+##  Performance Optimization
 
 ### 1. Database Optimization
 ```sql
@@ -329,7 +329,7 @@ Already configured in .htaccess via gzip
 mysql -u quote_user -p quote_system -e "OPTIMIZE TABLE quotes; OPTIMIZE TABLE clients; OPTIMIZE TABLE users;"
 ```
 
-## 🔐 Backup Strategy
+##  Backup Strategy
 
 ### Automated Daily Backup Script
 
@@ -367,14 +367,14 @@ crontab -e
 # Add: 0 2 * * * /usr/local/bin/backup-quote-system.sh
 ```
 
-## 📞 Support Resources
+##  Support Resources
 
 - PHP Manual: https://www.php.net/manual/
 - MySQL Manual: https://dev.mysql.com/doc/
 - Apache Documentation: https://httpd.apache.org/docs/
 - JWT Information: https://jwt.io/
 
-## 🎓 Learning Path
+##  Learning Path
 
 1. **Basics**: Understand the project structure
 2. **Database**: Learn the schema and relationships
@@ -387,5 +387,5 @@ crontab -e
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: 2024  
+**Last Updated**: 2026  
 **Support**: Check logs/error.log for issues
