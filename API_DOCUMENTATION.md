@@ -2,12 +2,12 @@
 
 Complete REST API reference for QuoteSystem.
 
-## 📡 Base URL
+##  Base URL
 ```
 http://localhost/q/api
 ```
 
-## 🔐 Authentication
+##  Authentication
 
 All endpoints (except auth) require a JWT token in the Authorization header:
 
@@ -21,7 +21,7 @@ Authorization: Bearer <token>
 - **Expiration**: 7 days
 - **Claims**: user_id, email, role
 
-## 📡 Response Format
+##  Response Format
 
 All responses are JSON:
 
@@ -50,7 +50,7 @@ All responses are JSON:
 - `404`: Not Found
 - `500`: Server Error
 
-## 🔑 Authentication Endpoints
+##  Authentication Endpoints
 
 ### POST /auth/login
 User login with email and password.
@@ -205,7 +205,7 @@ Delete a user.
 }
 ```
 
-## 🏢 Company Settings Endpoints
+##  Company Settings Endpoints
 
 ### GET /company
 Get company settings.
@@ -251,7 +251,7 @@ Save/update company settings.
 }
 ```
 
-## 📦 Catalog Endpoints
+##  Catalog Endpoints
 
 ### GET /catalog
 Get all catalog items.
@@ -346,7 +346,7 @@ Delete catalog item.
 }
 ```
 
-## 👤 Clients Endpoints
+##  Clients Endpoints
 
 ### GET /clients
 Get all clients.
@@ -419,7 +419,7 @@ Delete client.
 }
 ```
 
-## 📄 Quotes Endpoints
+##  Quotes Endpoints
 
 ### GET /quotes
 Get all quotes.
@@ -546,7 +546,7 @@ Delete quote.
 }
 ```
 
-## 📊 Statistics Endpoints
+##  Statistics Endpoints
 
 ### GET /stats
 Get dashboard statistics.
@@ -562,7 +562,7 @@ Get dashboard statistics.
 }
 ```
 
-## 🔄 Common Workflows
+##  Common Workflows
 
 ### Workflow 1: User Login
 1. POST /auth/login
@@ -582,7 +582,7 @@ Get dashboard statistics.
 3. PUT /catalog/{id} (update item)
 4. DELETE /catalog/{id} (remove item)
 
-## 🛠️ Example Requests
+##  Example Requests
 
 ### Login with curl
 ```bash
@@ -612,7 +612,7 @@ curl -X POST http://localhost/q/api/catalog \
   }'
 ```
 
-## 📝 Rate Limiting
+##  Rate Limiting
 
 Currently no rate limiting is enforced. For production, implement:
 
@@ -623,7 +623,7 @@ define('RATE_LIMIT_REQUESTS', 100); // per minute
 define('RATE_LIMIT_WINDOW', 60); // seconds
 ```
 
-## 🔐 Security Notes
+##  Security Notes
 
 - All passwords are hashed with bcrypt
 - JWT tokens expire after 7 days
@@ -635,4 +635,4 @@ define('RATE_LIMIT_WINDOW', 60); // seconds
 ---
 
 **API Version**: 1.0.0  
-**Last Updated**: 2024
+**Last Updated**: 2026
