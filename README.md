@@ -434,14 +434,14 @@ tar -czf $BACKUP_DIR/quote_system_$DATE.tar.gz /var/www/html/q
 find $BACKUP_DIR -name "*.sql" -mtime +30 -delete
 ```
 
-## 📱 Browser Support
+##  Browser Support
 
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
 - Edge 90+
 
-## 📞 Support
+##  Support
 
 For issues or questions:
 1. Check the logs: `/logs/error.log`
