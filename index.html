@@ -483,7 +483,15 @@
 <body>
     <div id="app"></div>
 
-    <script>
+    <script type="module">
+        import { renderDashboard } from './sections/dashboard.js';
+        import { renderNewQuote } from './sections/newQuote.js';
+        import { renderQuotesList } from './sections/quotes.js';
+        import { renderCatalog } from './sections/catalog.js';
+        import { renderClients } from './sections/clients.js';
+        import { renderUsers } from './sections/users.js';
+        import { renderSettings } from './sections/settings.js';
+
         // API BASE URL
         const API_BASE = './api';
 
@@ -858,12 +866,12 @@
                 `;
             },
 
-            renderNewQuote: () => `<div style="text-align: center; padding: 40px;">New Quote feature coming soon...</div>`,
-            renderQuotesList: () => `<div style="text-align: center; padding: 40px;">Quotes list coming soon...</div>`,
-            renderCatalog: () => `<div style="text-align: center; padding: 40px;">Catalog coming soon...</div>`,
-            renderClients: () => `<div style="text-align: center; padding: 40px;">Clients coming soon...</div>`,
-            renderUsers: () => `<div style="text-align: center; padding: 40px;">Users coming soon...</div>`,
-            renderSettings: () => `<div style="text-align: center; padding: 40px;">Settings coming soon...</div>`,
+            renderNewQuote: () => renderNewQuote(app.state, helpers),
+            renderQuotesList: () => renderQuotesList(app.state, helpers),
+            renderCatalog: () => renderCatalog(app.state, helpers),
+            renderClients: () => renderClients(app.state, helpers),
+            renderUsers: () => renderUsers(app.state, helpers),
+            renderSettings: () => renderSettings(app.state, helpers),
 
             attachEventListeners: () => {
                 // Auth mode switching
