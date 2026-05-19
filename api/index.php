@@ -1,7 +1,5 @@
 <?php
-// ════════════════════════════════════════════════════════════════════════════
 //  API ROUTER & HANDLERS
-// ════════════════════════════════════════════════════════════════════════════
 
 require_once 'config.php';
 require_once 'classes/Database.php';
@@ -13,7 +11,7 @@ $auth = new Auth($db);
 // Parse request
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$path = str_replace('/q/api/', '', $path);
+$path = preg_replace('#^/q/api/|^/api/#', '', $path);
 $parts = explode('/', trim($path, '/'));
 $endpoint = $parts[0] ?? '';
 $action = $parts[1] ?? '';
@@ -27,9 +25,7 @@ if (!file_exists(__DIR__ . '/db_initialized.flag')) {
 // Get POST data
 $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
-// ════════════════════════════════════════════════════════════════════════════
 // AUTH ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
 
 if ($endpoint === 'auth') {
     if ($action === 'login' && $method === 'POST') {
@@ -59,9 +55,7 @@ if ($endpoint === 'auth') {
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // USERS ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
 
 if ($endpoint === 'users') {
     Auth::requireAdmin();
@@ -115,10 +109,7 @@ if ($endpoint === 'users') {
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // COMPANY SETTINGS ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
-
 if ($endpoint === 'company') {
     Auth::requireAuth();
 
@@ -179,9 +170,7 @@ if ($endpoint === 'company') {
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // CATALOG ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
 
 if ($endpoint === 'catalog') {
     Auth::requireAuth();
@@ -241,9 +230,7 @@ if ($endpoint === 'catalog') {
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // CLIENTS ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
 
 if ($endpoint === 'clients') {
     Auth::requireAuth();
@@ -299,9 +286,7 @@ if ($endpoint === 'clients') {
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // QUOTES ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
 
 if ($endpoint === 'quotes') {
     Auth::requireAuth();
@@ -409,9 +394,7 @@ if ($endpoint === 'quotes') {
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // STATISTICS ENDPOINTS
-// ════════════════════════════════════════════════════════════════════════════
 
 if ($endpoint === 'stats') {
     Auth::requireAuth();
@@ -432,9 +415,7 @@ if ($endpoint === 'stats') {
     exit;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // DEFAULT RESPONSE
-// ════════════════════════════════════════════════════════════════════════════
 
 http_response_code(404);
 echo json_encode(['error' => 'Endpoint not found']);
