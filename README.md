@@ -2,7 +2,7 @@
 
 A complete, production-ready quote management application with user authentication, client management, product catalog, and professional quote generation.
 
-## 🌟 Features
+##  Features
 
 - **User Authentication**: Secure login and registration with JWT tokens
 - **Admin Panel**: User management and system administration
@@ -16,7 +16,7 @@ A complete, production-ready quote management application with user authenticati
 - **Role-Based Access**: Admin and user role management
 - **Dashboard Analytics**: Real-time statistics and overview
 
-## 📋 Project Structure
+##  Project Structure
 
 ```
 /q
@@ -32,7 +32,7 @@ A complete, production-ready quote management application with user authenticati
 └── README.md              # This file
 ```
 
-## 🔧 Technical Stack
+##  Technical Stack
 
 - **Backend**: PHP 7.4+
 - **Database**: MySQL 5.7+ or MariaDB
@@ -40,7 +40,7 @@ A complete, production-ready quote management application with user authenticati
 - **Authentication**: JWT (JSON Web Tokens)
 - **API**: RESTful architecture
 
-## 📦 Installation
+##  Installation
 
 ### Prerequisites
 - PHP 7.4 or higher
@@ -122,7 +122,7 @@ Open your browser and navigate to:
 http://localhost/q/
 ```
 
-## 🔐 Default Credentials
+##  Default Credentials
 
 When you first access the system, the database tables are automatically created with a default admin user:
 
@@ -193,7 +193,7 @@ When you first access the system, the database tables are automatically created 
 |--------|----------|-------------|
 | GET | `/api/stats` | Get dashboard statistics |
 
-## 🔄 Database Schema
+##  Database Schema
 
 ### Users Table
 ```sql
@@ -284,7 +284,7 @@ When you first access the system, the database tables are automatically created 
 - created_at (TIMESTAMP)
 ```
 
-## 🛡️ Security Features
+##  Security Features
 
 - **Password Hashing**: BCrypt with cost=12
 - **JWT Authentication**: 7-day token expiration
@@ -296,7 +296,7 @@ When you first access the system, the database tables are automatically created 
 - **Role-Based Access Control**: Admin and user roles
 - **Error Logging**: Secure error logging to files
 
-## 🚀 Usage Guide
+##  Usage Guide
 
 ### 1. Initial Setup
 1. Log in with admin credentials
@@ -332,7 +332,7 @@ When you first access the system, the database tables are automatically created 
 4. Preview quotes before printing
 5. Export as PDF using browser print function
 
-## 💻 Frontend Architecture
+##  Frontend Architecture
 
 The frontend is a Single Page Application (SPA) built with vanilla JavaScript. Key components:
 
@@ -345,7 +345,7 @@ The frontend is a Single Page Application (SPA) built with vanilla JavaScript. K
 - **Modals**: Pop-up dialogs for editing
 - **Notifications**: Toast notifications for feedback
 
-## 📝 Configuration Options
+##  Configuration Options
 
 Edit `config.php` to customize:
 
@@ -368,7 +368,7 @@ define('UPLOAD_DIR', __DIR__ . '/uploads/');
 define('SESSION_TIMEOUT', 3600); // 1 hour
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Database Connection Failed
 - Check database credentials in `config.php`
@@ -399,7 +399,7 @@ define('SESSION_TIMEOUT', 3600); // 1 hour
 - Run: `chmod 777 uploads logs`
 - Verify web server user owns files
 
-## 📊 Performance Tips
+##  Performance Tips
 
 1. **Database Optimization**
    - Add indexes on frequently searched columns
@@ -416,7 +416,7 @@ define('SESSION_TIMEOUT', 3600); // 1 hour
    - Filter queries on backend
    - Use database views for complex queries
 
-## 🔄 Backup & Recovery
+##  Backup & Recovery
 
 ### Daily Backup Script
 ```bash
@@ -449,11 +449,11 @@ For issues or questions:
 3. Test API endpoints with Postman
 4. Check browser console for errors
 
-## 📄 License
+##  License
 
 This project is provided as-is for commercial use.
 
-## 🎯 Roadmap
+##  Roadmap
 
 Future features:
 - Email notification system
@@ -465,7 +465,7 @@ Future features:
 - Automatic quote reminders
 - Customer portal
 
-## 🔐 Security Checklist
+##  Security Checklist
 
 Before deploying to production:
 - [ ] Change admin credentials
