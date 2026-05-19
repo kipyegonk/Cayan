@@ -58,7 +58,7 @@ q/
 └── README.md              # Full documentation
 ```
 
-## 🔧 Server Requirements
+##  Server Requirements
 
 ### Minimum
 - PHP 7.4
