@@ -482,5 +482,5 @@ Before deploying to production:
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: 2024  
-**Author**: QuoteSystem Development Team
+**Last Updated**: 2026  
+**Author**: Soy
