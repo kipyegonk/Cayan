@@ -1,8 +1,8 @@
 export function renderSettings(state, helpers) {
     const dropdowns = state.dropdowns || {
-        categories: ['General', 'Maintenance', 'Development', 'Services', 'Installation'],
+        categories: ['General', 'Church Setup', 'Tent & Décor', 'Flowers', 'Logistics', 'Maintenance', 'Development', 'Services', 'Installation'],
         margins: [10, 15, 20, 25, 30, 35, 40],
-        units: ['unit', 'hr', 'project', 'year']
+        units: ['unit', 'hr', 'lot', 'project', 'year']
     };
 
     const renderTable = (type, label, values) => `

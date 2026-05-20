@@ -759,9 +759,9 @@
 
             loadDropdownSettings() {
                 const defaults = {
-                    categories: ['General', 'Maintenance', 'Development', 'Services', 'Installation'],
+                    categories: ['General', 'Church Setup', 'Tent & Décor', 'Flowers', 'Logistics', 'Maintenance', 'Development', 'Services', 'Installation'],
                     margins: [10, 15, 20, 25, 30, 35, 40],
-                    units: ['unit', 'hr', 'project', 'year']
+                    units: ['unit', 'hr', 'lot', 'project', 'year']
                 };
                 const dropdowns = {};
 
@@ -887,9 +887,9 @@
                 if (!modal) return '';
 
                 const item = modal.item;
-                const categories = app.state.dropdowns?.categories || ['General', 'Maintenance', 'Development', 'Services', 'Installation'];
+                const categories = app.state.dropdowns?.categories || ['General', 'Church Setup', 'Tent & Décor', 'Flowers', 'Logistics', 'Maintenance', 'Development', 'Services', 'Installation'];
                 const margins = app.state.dropdowns?.margins || [10, 15, 20, 25, 30, 35, 40];
-                const units = app.state.dropdowns?.units || ['unit', 'hr', 'project', 'year'];
+                const units = app.state.dropdowns?.units || ['unit', 'hr', 'lot', 'project', 'year'];
 
                 return `
                     <div class="modal catalog-modal">
