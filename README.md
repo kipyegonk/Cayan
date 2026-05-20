@@ -131,7 +131,7 @@ When you first access the system, the database tables are automatically created 
 
 ⚠️ **IMPORTANT**: Change these credentials immediately after first login!
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ### Authentication
 
