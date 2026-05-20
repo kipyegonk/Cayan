@@ -616,6 +616,7 @@
                 users: [],
                 previewQuote: null,
                 catalogModal: null,
+                dropdowns: null,
             },
 
             notify: (msg, type = 'success') => {
@@ -736,6 +737,8 @@
             },
 
             async loadAppData() {
+                app.loadDropdownSettings();
+
                 const [company, catalog, clients, quotes, stats] = await Promise.all([
                     API.company.get(),
                     API.catalog.getAll(),
@@ -754,6 +757,86 @@
                 app.render();
             },
 
+            loadDropdownSettings() {
+                const defaults = {
+                    categories: ['General', 'Maintenance', 'Development', 'Services', 'Installation'],
+                    margins: [10, 15, 20, 25, 30, 35, 40],
+                    units: ['unit', 'hr', 'project', 'year']
+                };
+                const dropdowns = {};
+
+                Object.keys(defaults).forEach(key => {
+                    const stored = localStorage.getItem(`quote_system_dropdown_${key}`);
+                    if (stored) {
+                        try {
+                            const parsed = JSON.parse(stored);
+                            dropdowns[key] = Array.isArray(parsed) ? parsed : defaults[key];
+                        } catch {
+                            dropdowns[key] = defaults[key];
+                        }
+                    } else {
+                        dropdowns[key] = defaults[key];
+                    }
+                });
+
+                app.state.dropdowns = dropdowns;
+            },
+
+            saveDropdownSettings() {
+                if (!app.state.dropdowns) return;
+
+                Object.keys(app.state.dropdowns).forEach(key => {
+                    localStorage.setItem(`quote_system_dropdown_${key}`, JSON.stringify(app.state.dropdowns[key]));
+                });
+            },
+
+            handleDropdownAdd(type) {
+                const current = app.state.dropdowns?.[type] || [];
+                const label = type === 'margins' ? 'Margin percentage' : type === 'units' ? 'Unit name' : 'Category name';
+                const value = window.prompt(`Add new ${label}`);
+                if (!value) return;
+
+                const newValue = type === 'margins' ? parseInt(value, 10) : value.trim();
+                if (newValue === '' || Number.isNaN(newValue)) return;
+                if (current.includes(newValue)) {
+                    app.notify(`${label} already exists`, 'error');
+                    return;
+                }
+
+                app.state.dropdowns[type] = [...current, newValue];
+                app.saveDropdownSettings();
+                app.notify(`${label} added`, 'success');
+                app.render();
+            },
+
+            handleDropdownEdit(type, oldValue) {
+                const current = app.state.dropdowns?.[type] || [];
+                const label = type === 'margins' ? 'Margin percentage' : type === 'units' ? 'Unit name' : 'Category name';
+                const parsedOldValue = type === 'margins' ? parseInt(oldValue, 10) : oldValue;
+                const value = window.prompt(`Edit ${label}`, oldValue);
+                if (value === null) return;
+
+                const newValue = type === 'margins' ? parseInt(value, 10) : value.trim();
+                if (newValue === '' || Number.isNaN(newValue)) return;
+                if (newValue === parsedOldValue) return;
+
+                app.state.dropdowns[type] = current.map(item => item === parsedOldValue ? newValue : item);
+                app.saveDropdownSettings();
+                app.notify(`${label} updated`, 'success');
+                app.render();
+            },
+
+            handleDropdownDelete(type, oldValue) {
+                const current = app.state.dropdowns?.[type] || [];
+                const parsedOldValue = type === 'margins' ? parseInt(oldValue, 10) : oldValue;
+                if (!window.confirm('Remove this dropdown value?')) return;
+
+                app.state.dropdowns[type] = current.filter(item => item !== parsedOldValue);
+                app.saveDropdownSettings();
+                app.notify('Dropdown value deleted', 'success');
+                app.render();
+            },
+
             closeCatalogModal() {
                 app.state.catalogModal = null;
                 app.render();
@@ -762,24 +845,25 @@
             async saveCatalogModal() {
                 if (!app.state.catalogModal) return;
 
-                const textarea = document.getElementById('catalog-modal-text');
-                if (!textarea) return;
+                const name = document.getElementById('catalog-name')?.value.trim();
+                const category = document.getElementById('catalog-category')?.value.trim() || (app.state.dropdowns?.categories?.[0] || 'General');
+                const description = document.getElementById('catalog-description')?.value.trim() || '';
+                const cost_price = parseFloat(document.getElementById('catalog-cost_price')?.value) || 0;
+                const margin = parseInt(document.getElementById('catalog-margin')?.value, 10) || (app.state.dropdowns?.margins?.[0] || 0);
+                const unit = document.getElementById('catalog-unit')?.value.trim() || (app.state.dropdowns?.units?.[0] || 'unit');
 
-                const lines = textarea.value.split('\n');
-                const data = {};
-                lines.forEach(line => {
-                    const [key, ...rest] = line.split(':');
-                    if (!key) return;
-                    data[key.trim().toLowerCase()] = rest.join(':').trim();
-                });
+                if (!name) {
+                    app.notify('Name is required', 'error');
+                    return;
+                }
 
                 const payload = {
-                    name: data.name || '',
-                    category: data.category || 'General',
-                    description: data.description || '',
-                    cost_price: parseFloat(data['cost price'] || data.cost_price || '0') || 0,
-                    margin: parseInt(data.margin || '20', 10) || 0,
-                    unit: data.unit || 'unit'
+                    name,
+                    category,
+                    description,
+                    cost_price,
+                    margin,
+                    unit
                 };
 
                 let result;
@@ -803,7 +887,9 @@
                 if (!modal) return '';
 
                 const item = modal.item;
-                const content = `name: ${item.name}\ncategory: ${item.category}\ndescription: ${item.description}\ncost price: ${item.cost_price}\nmargin: ${item.margin}\nunit: ${item.unit}`;
+                const categories = app.state.dropdowns?.categories || ['General', 'Maintenance', 'Development', 'Services', 'Installation'];
+                const margins = app.state.dropdowns?.margins || [10, 15, 20, 25, 30, 35, 40];
+                const units = app.state.dropdowns?.units || ['unit', 'hr', 'project', 'year'];
 
                 return `
                     <div class="modal catalog-modal">
@@ -812,9 +898,39 @@
                                 <h3 class="modal-title">${modal.edit ? 'Edit Catalog Item' : 'Add Catalog Item'}</h3>
                                 <button class="modal-close catalog-modal-close">×</button>
                             </div>
-                            <p style="color: #6B7280; margin-bottom: 18px;">Edit each field on its own line. Use the line content to update values directly.</p>
-                            <textarea id="catalog-modal-text" style="width: 100%; min-height: 220px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 14px; line-height: 1.6;">${content}</textarea>
-                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                            <div class="form-grid" style="gap: 14px; margin-bottom: 16px;">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input id="catalog-name" class="input-field" type="text" value="${item.name}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select id="catalog-category" class="input-field">
+                                        ${categories.map(cat => `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cost Price</label>
+                                    <input id="catalog-cost_price" class="input-field" type="number" step="0.01" value="${item.cost_price}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Margin</label>
+                                    <select id="catalog-margin" class="input-field">
+                                        ${margins.map(value => `<option value="${value}" ${value.toString() === item.margin.toString() ? 'selected' : ''}>${value}%</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit</label>
+                                    <select id="catalog-unit" class="input-field">
+                                        ${units.map(value => `<option value="${value}" ${value === item.unit ? 'selected' : ''}>${value}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group full">
+                                    <label>Description</label>
+                                    <input id="catalog-description" class="input-field" type="text" value="${item.description}" />
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
                                 <button class="button secondary catalog-modal-close">Cancel</button>
                                 <button class="button green catalog-modal-save">${modal.edit ? 'Save changes' : 'Create item'}</button>
                             </div>
@@ -1071,6 +1187,24 @@
                 document.querySelectorAll('.catalog-delete-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         app.handleCatalogDelete(e.currentTarget.dataset.id);
+                    });
+                });
+
+                document.querySelectorAll('.dropdown-add-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleDropdownAdd(e.currentTarget.dataset.type);
+                    });
+                });
+
+                document.querySelectorAll('.dropdown-edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleDropdownEdit(e.currentTarget.dataset.type, e.currentTarget.dataset.value);
+                    });
+                });
+
+                document.querySelectorAll('.dropdown-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleDropdownDelete(e.currentTarget.dataset.type, e.currentTarget.dataset.value);
                     });
                 });
 
