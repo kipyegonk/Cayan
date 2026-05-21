@@ -344,7 +344,7 @@
             unit: 'unit',
         },
 
-        // ── LOGISTICS ─────────────────────────────────────────
+        // LOGISTICS 
         {
             name: 'Florist Labour & Transport',
             category: 'Logistics',
