@@ -1,7 +1,5 @@
 <?php
-// ════════════════════════════════════════════════════════════════════════════
 //  DATABASE CLASS
-// ════════════════════════════════════════════════════════════════════════════
 
 class Database {
     private $conn;
@@ -130,6 +128,7 @@ class Database {
                 quote_id VARCHAR(36) NOT NULL,
                 name VARCHAR(255),
                 description TEXT,
+                category VARCHAR(100),
                 quantity INT,
                 unit VARCHAR(50),
                 unit_price DECIMAL(10, 2),
@@ -149,6 +148,26 @@ class Database {
         foreach ($queries as $query) {
             if (!$this->conn->query($query)) {
                 $this->logError('Table creation failed: ' . $this->conn->error);
+            }
+        }
+
+        // Add missing columns for existing databases
+        $quoteItemCategory = $this->conn->query("SHOW COLUMNS FROM quote_items LIKE 'category'");
+        if ($quoteItemCategory && $quoteItemCategory->num_rows === 0) {
+            $this->conn->query("ALTER TABLE quote_items ADD COLUMN category VARCHAR(100) AFTER unit");
+        }
+
+        $quoteColumns = [
+            'title' => "ALTER TABLE quotes ADD COLUMN title VARCHAR(255) AFTER client_company",
+            'venue' => "ALTER TABLE quotes ADD COLUMN venue VARCHAR(255) AFTER title",
+            'guests' => "ALTER TABLE quotes ADD COLUMN guests VARCHAR(50) AFTER venue",
+            'contact_person' => "ALTER TABLE quotes ADD COLUMN contact_person VARCHAR(255) AFTER guests",
+        ];
+
+        foreach ($quoteColumns as $column => $sql) {
+            $result = $this->conn->query("SHOW COLUMNS FROM quotes LIKE '{$column}'");
+            if ($result && $result->num_rows === 0) {
+                $this->conn->query($sql);
             }
         }
 
