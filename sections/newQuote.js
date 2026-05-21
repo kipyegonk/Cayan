@@ -90,22 +90,36 @@ function renderQuotePreview(quote, company, helpers) {
         return groups;
     }, {});
 
-    const itemRows = Object.keys(groupedItems).map(category => `
-        <tr class="quote-table-section-row">
-            <td colspan="4">${category}</td>
-        </tr>
-        ${groupedItems[category].map(item => {
-            const lineTotal = (Number(item.quantity) || 0) * (Number(item.unit_price) || 0);
-            return `
-                <tr>
-                    <td>${item.quantity || 0}</td>
-                    <td>${item.name || '—'}${item.description ? `<div style="font-size:12px; color:#4B5563; margin-top:4px;">${item.description}</div>` : ''}</td>
-                    <td>${helpers.formatMoney(item.unit_price, currency)}</td>
-                    <td>${helpers.formatMoney(lineTotal, currency)}</td>
-                </tr>
-            `;
-        }).join('')}
-    `).join('');
+    const itemRows = Object.keys(groupedItems).map(category => {
+        const categoryTotal = groupedItems[category].reduce((sum, item) => {
+            return sum + ((Number(item.quantity) || 0) * (Number(item.unit_price) || 0));
+        }, 0);
+
+        return `
+            <tr class="quote-table-section-row">
+                <td colspan="4">${category}</td>
+            </tr>
+            ${groupedItems[category].map(item => {
+                const lineTotal = (Number(item.quantity) || 0) * (Number(item.unit_price) || 0);
+                return `
+                    <tr>
+                        <td class="text-center">${item.quantity || 0}</td>
+                        <td>
+                            <div class="item-name">${item.name || '—'}</div>
+                            ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
+                        </td>
+                        <td class="text-right">${helpers.formatMoney(item.unit_price, currency)}</td>
+                        <td class="text-right">${helpers.formatMoney(lineTotal, currency)}</td>
+                    </tr>
+                `;
+            }).join('')}
+            <tr class="quote-table-category-total-row">
+                <td colspan="2"></td>
+                <td class="text-right"><strong>${category} total</strong></td>
+                <td class="text-right">${helpers.formatMoney(categoryTotal, currency)}</td>
+            </tr>
+        `;
+    }).join('');
 
     return `
         <div class="quote-preview" id="quote-preview">
@@ -113,66 +127,75 @@ function renderQuotePreview(quote, company, helpers) {
                 <div class="quote-branding">
                     <div class="quote-logo">${companyName.charAt(0) || 'Q'}</div>
                     <div>
-                        <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.08em;">${companyName}</div>
-                        <div style="font-size: 13px; color: #4B5563; margin-top: 6px;">${companyAddress}</div>
+                        <div style="font-size: 18px; font-weight: 800; letter-spacing: 0.08em;">${companyName}</div>
+                        <div style="font-size: 13px; color: #4B5563; margin-top: 4px;">${companyAddress}</div>
                     </div>
                 </div>
                 <div class="quote-contact">
-                    <div><strong>Phone:</strong> ${companyPhone}</div>
-                    <div><strong>Email:</strong> ${companyEmail}</div>
-                    <div><strong>Address:</strong> ${companyAddress}</div>
+                    <div><strong>Phone</strong> ${companyPhone}</div>
+                    <div><strong>Email</strong> ${companyEmail}</div>
+                    <div><strong>Address</strong> ${companyAddress}</div>
                 </div>
             </div>
 
+            <div class="quote-title">QUOTATION</div>
+
             <div class="quote-top-details">
                 <div>
-                    <div><strong>Statement No:</strong> ${quote.number || 'Draft'}</div>
-                    <div><strong>Title:</strong> ${quote.title || '-'}</div>
+                    <div><strong>Statement No</strong></div>
+                    <div>${quote.number || 'Draft'}</div>
+                    <div style="margin-top: 12px;"><strong>Date</strong></div>
+                    <div>${helpers.formatDate(quote.quote_date)}</div>
                 </div>
                 <div>
-                    <div><strong>Date:</strong> ${helpers.formatDate(quote.quote_date)}</div>
-                    <div><strong>Venue:</strong> ${quote.venue || '-'}</div>
+                    <div><strong>Title</strong></div>
+                    <div>${quote.title || '-'}</div>
+                    <div style="margin-top: 12px;"><strong>Venue</strong></div>
+                    <div>${quote.venue || '-'}</div>
                 </div>
                 <div>
-                    <div><strong>No of Guests:</strong> ${quote.guests || '-'}</div>
-                    <div><strong>Contact Person:</strong> ${quote.contact_person || (quote.client_name || '-')}</div>
+                    <div><strong>No of Guests</strong></div>
+                    <div>${quote.guests || '-'}</div>
+                    <div style="margin-top: 12px;"><strong>Contact Person</strong></div>
+                    <div>${quote.contact_person || (quote.client_name || '-')}</div>
                 </div>
             </div>
 
             <table class="quote-table">
                 <thead>
                     <tr>
-                        <th style="width: 60px;">Qty</th>
+                        <th style="width: 70px;">Qty</th>
                         <th>Description</th>
                         <th style="width: 140px;">Unit Price</th>
                         <th style="width: 140px;">Price</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${itemRows || '<tr><td colspan="4" style="padding: 20px; text-align:center;">No quote items added yet.</td></tr>'}
+                    ${itemRows || '<tr><td colspan="4" style="padding: 20px; text-align:center; color:#6B7280;">No quote items added yet.</td></tr>'}
                 </tbody>
             </table>
 
             <div class="quote-summary">
                 <div>
                     <div class="quote-terms-title">Terms and Conditions</div>
-                    <ul style="margin-top: 8px; padding-left: 18px; color: #4B5563; font-size: 12px; line-height: 1.65;">
-                        <li>Payment before delivery.</li>
-                        <li>The client is responsible for supplying and arranging the above facilities.</li>
-                        <li>All cancellations are subject to company cancellation terms.</li>
+                    <ul class="quote-terms-list">
+                        <li>Full payment before delivery.</li>
+                        <li>Cayan Events Ke. is responsible for supplying and arranging the above facilities.</li>
+                        <li>The client agrees to the full deposit and any cancellation charges.</li>
+                        <li>The client is responsible for all event permits and venue approvals.</li>
                     </ul>
                 </div>
                 <div class="quote-total">
-                    <div><span>TOTAL</span><strong>${helpers.formatMoney(quote.subtotal, currency)}</strong></div>
+                    <div><span>SUBTOTAL</span><strong>${helpers.formatMoney(quote.subtotal, currency)}</strong></div>
                     <div><span>VAT ${quote.vat_rate}%</span><strong>${helpers.formatMoney(quote.vat_amount, currency)}</strong></div>
-                    <div style="margin-top: 10px; font-size: 16px; font-weight: 700; border-top: 1px solid var(--border); padding-top: 10px;"><span>TOTAL VAT INC.</span><strong>${helpers.formatMoney(quote.total, currency)}</strong></div>
+                    <div class="quote-total-final"><span>TOTAL VAT INC.</span><strong>${helpers.formatMoney(quote.total, currency)}</strong></div>
                 </div>
             </div>
 
             <div class="quote-footer">
                 <div>Regards,</div>
-                <div style="margin-top: 18px; font-weight: 700;">${quote.contact_person || quote.client_name || 'Contact Name'}</div>
-                <div style="margin-top: 6px; font-size: 12px; color: #4B5563;">Date: ${helpers.formatDate(quote.quote_date)}</div>
+                <div class="quote-signature">${quote.contact_person || quote.client_name || 'Contact Name'}</div>
+                <div class="quote-signature-date">Date: ${helpers.formatDate(quote.quote_date)}</div>
             </div>
 
             <div class="quote-actions">
