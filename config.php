@@ -1,5 +1,4 @@
 <?php
-//  DATABASE & APP CONFIGURATION
 
 // Database Configuration
 define('DB_HOST', 'localhost');
@@ -19,7 +18,7 @@ define('SESSION_TIMEOUT', 3600);
 
 // File Uploads
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
-define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
+define('MAX_FILE_SIZE', 5 * 1024 * 1024); 
 define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
 
 // API Response Headers
