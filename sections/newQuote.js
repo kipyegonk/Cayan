@@ -83,78 +83,96 @@ function renderQuotePreview(quote, company, helpers) {
     const companyAddress = company.address || 'Company address';
     const paymentTerms = company.terms || 'Payment due within 30 days from invoice date.';
 
+    const groupedItems = (quote.items || []).reduce((groups, item) => {
+        const category = item.category || 'General';
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(item);
+        return groups;
+    }, {});
+
+    const itemRows = Object.keys(groupedItems).map(category => `
+        <tr class="quote-table-section-row">
+            <td colspan="4">${category}</td>
+        </tr>
+        ${groupedItems[category].map(item => {
+            const lineTotal = (Number(item.quantity) || 0) * (Number(item.unit_price) || 0);
+            return `
+                <tr>
+                    <td>${item.quantity || 0}</td>
+                    <td>${item.name || '—'}${item.description ? `<div style="font-size:12px; color:#4B5563; margin-top:4px;">${item.description}</div>` : ''}</td>
+                    <td>${helpers.formatMoney(item.unit_price, currency)}</td>
+                    <td>${helpers.formatMoney(lineTotal, currency)}</td>
+                </tr>
+            `;
+        }).join('')}
+    `).join('');
+
     return `
         <div class="quote-preview" id="quote-preview">
             <div class="quote-header">
+                <div class="quote-branding">
+                    <div class="quote-logo">${companyName.charAt(0) || 'Q'}</div>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.08em;">${companyName}</div>
+                        <div style="font-size: 13px; color: #4B5563; margin-top: 6px;">${companyAddress}</div>
+                    </div>
+                </div>
+                <div class="quote-contact">
+                    <div><strong>Phone:</strong> ${companyPhone}</div>
+                    <div><strong>Email:</strong> ${companyEmail}</div>
+                    <div><strong>Address:</strong> ${companyAddress}</div>
+                </div>
+            </div>
+
+            <div class="quote-top-details">
                 <div>
-                    <h3>Quotation</h3>
-                    <div style="font-weight: 700; font-size: 14px; color: #374151;">${quote.number || 'Draft Quote'}</div>
+                    <div><strong>Statement No:</strong> ${quote.number || 'Draft'}</div>
+                    <div><strong>Title:</strong> ${quote.title || '-'}</div>
                 </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 14px; font-weight: 700;">${companyName}</div>
-                    <div style="font-size: 13px; color: #4B5563;">${companyAddress}</div>
-                    <div style="font-size: 13px; color: #4B5563; margin-top: 8px;">${companyEmail}</div>
-                    <div style="font-size: 13px; color: #4B5563;">${companyPhone}</div>
+                <div>
+                    <div><strong>Date:</strong> ${helpers.formatDate(quote.quote_date)}</div>
+                    <div><strong>Venue:</strong> ${quote.venue || '-'}</div>
                 </div>
-            </div>
-
-            <div class="quote-meta">
-                <div><strong>Quote date</strong>${helpers.formatDate(quote.quote_date)}</div>
-                <div><strong>Valid until</strong>${helpers.formatDate(quote.valid_until)}</div>
-                <div><strong>Quote status</strong>${quote.status?.toUpperCase() || 'DRAFT'}</div>
-                <div><strong>VAT rate</strong>${quote.vat_rate}%</div>
-            </div>
-
-            <div class="quote-client">
-                <div><strong>Client name</strong>${quote.client_name || 'Client name'}</div>
-                <div><strong>Company</strong>${quote.client_company || 'Client company'}</div>
+                <div>
+                    <div><strong>No of Guests:</strong> ${quote.guests || '-'}</div>
+                    <div><strong>Contact Person:</strong> ${quote.contact_person || (quote.client_name || '-')}</div>
+                </div>
             </div>
 
             <table class="quote-table">
                 <thead>
                     <tr>
-                        <th>Item</th>
+                        <th style="width: 60px;">Qty</th>
                         <th>Description</th>
-                        <th>Qty</th>
-                        <th>Unit</th>
-                        <th>Rate</th>
-                        <th>Margin</th>
-                        <th>Total</th>
+                        <th style="width: 140px;">Unit Price</th>
+                        <th style="width: 140px;">Price</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${quote.items.map(item => {
-                        const lineTotal = (Number(item.quantity) || 0) * (Number(item.unit_price) || 0);
-                        return `
-                            <tr>
-                                <td>${item.name || '—'}</td>
-                                <td>${item.description || '—'}</td>
-                                <td>${item.quantity || 0}</td>
-                                <td>${item.unit || '-'}</td>
-                                <td>${helpers.formatMoney(item.unit_price, currency)}</td>
-                                <td>${item.margin || 0}%</td>
-                                <td>${helpers.formatMoney(lineTotal, currency)}</td>
-                            </tr>
-                        `;
-                    }).join('')}
+                    ${itemRows || '<tr><td colspan="4" style="padding: 20px; text-align:center;">No quote items added yet.</td></tr>'}
                 </tbody>
             </table>
 
             <div class="quote-summary">
                 <div>
-                    <div><strong>Notes</strong></div>
-                    <div style="color: #374151;">${quote.notes || 'No special notes added.'}</div>
+                    <div class="quote-terms-title">Terms and Conditions</div>
+                    <ul style="margin-top: 8px; padding-left: 18px; color: #4B5563; font-size: 12px; line-height: 1.65;">
+                        <li>Payment before delivery.</li>
+                        <li>The client is responsible for supplying and arranging the above facilities.</li>
+                        <li>All cancellations are subject to company cancellation terms.</li>
+                    </ul>
                 </div>
                 <div class="quote-total">
-                    <div><span>Subtotal</span><strong>${helpers.formatMoney(quote.subtotal, currency)}</strong></div>
-                    <div><span>VAT (${quote.vat_rate}%)</span><strong>${helpers.formatMoney(quote.vat_amount, currency)}</strong></div>
-                    <div style="font-size: 16px; font-weight: 700; border-top: 1px solid var(--border); padding-top: 10px;"><span>Total</span><strong>${helpers.formatMoney(quote.total, currency)}</strong></div>
+                    <div><span>TOTAL</span><strong>${helpers.formatMoney(quote.subtotal, currency)}</strong></div>
+                    <div><span>VAT ${quote.vat_rate}%</span><strong>${helpers.formatMoney(quote.vat_amount, currency)}</strong></div>
+                    <div style="margin-top: 10px; font-size: 16px; font-weight: 700; border-top: 1px solid var(--border); padding-top: 10px;"><span>TOTAL VAT INC.</span><strong>${helpers.formatMoney(quote.total, currency)}</strong></div>
                 </div>
             </div>
 
             <div class="quote-footer">
-                <div><strong>Payment terms</strong></div>
-                <div>${paymentTerms}</div>
+                <div>Regards,</div>
+                <div style="margin-top: 18px; font-weight: 700;">${quote.contact_person || quote.client_name || 'Contact Name'}</div>
+                <div style="margin-top: 6px; font-size: 12px; color: #4B5563;">Date: ${helpers.formatDate(quote.quote_date)}</div>
             </div>
 
             <div class="quote-actions">
