@@ -371,7 +371,7 @@
         },
     ];
 
-    // ── Existing items: skip duplicates by name + category ──
+    // Existing items
     let existing = [];
     try {
         const catalogRes = await fetch('./api/catalog', {
