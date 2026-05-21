@@ -1,39 +1,16 @@
-/**
- * js/catalog-seed.js
- * ============================================================
- * One-time seed script: posts all Cayan Events catalog items
- * to the API so they appear in the system immediately.
- *
- * HOW TO USE (two options):
- *
- * OPTION A — In the browser console (easiest):
- *   1. Log in to the system as admin.
- *   2. Open DevTools → Console.
- *   3. Paste the entire contents of this file and press Enter.
- *   4. Watch the output — each item logs success/failure.
- *
- * OPTION B — Include in index.html temporarily:
- *   <script src="./js/catalog-seed.js"></script>
- *   Remove the tag once seeding is done.
- *
- * Items already in the DB (same name + category) are skipped
- * to prevent duplicates.
- * ============================================================
- */
-
 (async function seedCatalog() {
 
-    // ── Guard: must be logged in ────────────────────────────
+    // Guard: must be logged in 
     const token = localStorage.getItem('auth_token');
     if (!token) {
         console.error('[CatalogSeed] Not logged in. Please log in first.');
         return;
     }
 
-    // ── Catalog items (from JOAN_LANG_AT quotation) ─────────
+    // Catalog items
     const ITEMS = [
 
-        // ── CHURCH SETUP ─────────────────────────────────────
+        // CHURCH SETUP
         {
             name: 'Entrance Floral Arc',
             category: 'Church Setup',
