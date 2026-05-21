@@ -8,6 +8,10 @@ function createDefaultDraft(state, helpers) {
         client_id: '',
         client_name: '',
         client_company: '',
+        title: '',
+        venue: '',
+        guests: '',
+        contact_person: '',
         quote_date: today,
         valid_days: validDays,
         valid_until: helpers.addDays(today, validDays),
@@ -24,6 +28,7 @@ function createDefaultDraft(state, helpers) {
                 id: helpers.generateId(),
                 name: '',
                 description: '',
+                category: state.dropdowns?.categories?.[0] || 'General',
                 quantity: 1,
                 unit: defaultUnit,
                 unit_price: '0.00',
@@ -45,9 +50,14 @@ function renderClientOptions(clients, quote) {
     return options.join('');
 }
 
-function renderQuoteItems(quote, units) {
+function renderQuoteItems(quote, units, categories) {
     return quote.items.map(item => `
         <tr class="quote-item-row">
+            <td>
+                <select data-item-id="${item.id}" data-quote-item-field="category" class="input-field">
+                    ${categories.map(category => `<option value="${category}" ${category === item.category ? 'selected' : ''}>${category}</option>`).join('')}
+                </select>
+            </td>
             <td><input data-item-id="${item.id}" data-quote-item-field="name" class="input-field" type="text" value="${item.name}" placeholder="Item name"></td>
             <td><input data-item-id="${item.id}" data-quote-item-field="description" class="input-field" type="text" value="${item.description}" placeholder="Description"></td>
             <td><input data-item-id="${item.id}" data-quote-item-field="quantity" class="input-field" type="number" min="1" value="${item.quantity}"></td>
@@ -56,8 +66,8 @@ function renderQuoteItems(quote, units) {
                     ${units.map(unit => `<option value="${unit}" ${unit === item.unit ? 'selected' : ''}>${unit}</option>`).join('')}
                 </select>
             </td>
-            <td><input data-quote-item-field data-item-id="${item.id}" data-quote-item-field="unit_price" class="input-field" type="number" min="0" step="0.01" value="${item.unit_price}"></td>
-            <td><input data-quote-item-field data-item-id="${item.id}" data-quote-item-field="margin" class="input-field" type="number" min="0" max="100" value="${item.margin}"></td>
+            <td><input data-item-id="${item.id}" data-quote-item-field="unit_price" class="input-field" type="number" min="0" step="0.01" value="${item.unit_price}"></td>
+            <td><input data-item-id="${item.id}" data-quote-item-field="margin" class="input-field" type="number" min="0" max="100" value="${item.margin}"></td>
             <td class="text-center">
                 <button type="button" class="button secondary quote-item-remove-btn" data-item-id="${item.id}">Remove</button>
             </td>
