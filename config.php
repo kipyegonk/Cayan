@@ -15,7 +15,7 @@ define('JWT_SECRET', 'your-jwt-secret-key-here-change-this');
 
 // Security
 define('HASH_ALGO', 'bcrypt');
-define('SESSION_TIMEOUT', 3600); // 1 hour
+define('SESSION_TIMEOUT', 3600); 
 
 // File Uploads
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
