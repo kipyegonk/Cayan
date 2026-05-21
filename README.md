@@ -1,4 +1,4 @@
-# QuoteSystem - Professional Quote Management System
+# QuoteSystem - Quote Management System
 
 A complete, production-ready quote management application with user authentication, client management, product catalog, and professional quote generation.
 
