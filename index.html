@@ -453,6 +453,149 @@
             grid-column: 1 / -1;
         }
 
+        .quote-layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .quote-section {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .quote-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+        }
+
+        .quote-preview {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+            min-height: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .quote-preview .quote-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .quote-preview .quote-header h3 {
+            margin-bottom: 8px;
+            font-size: 22px;
+            letter-spacing: 0.02em;
+        }
+
+        .quote-preview .quote-meta,
+        .quote-preview .quote-client,
+        .quote-preview .quote-summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .quote-preview .quote-meta div,
+        .quote-preview .quote-client div,
+        .quote-preview .quote-summary div {
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .quote-preview .quote-meta div strong,
+        .quote-preview .quote-summary div strong {
+            display: block;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+        }
+
+        .quote-preview table.quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .quote-preview table.quote-table th,
+        .quote-preview table.quote-table td {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .quote-preview table.quote-table th {
+            background: #F8FAFC;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .quote-preview .quote-summary {
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .quote-preview .quote-summary .quote-total {
+            display: grid;
+            gap: 8px;
+            min-width: 220px;
+        }
+
+        .quote-preview .quote-summary .quote-total div {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .quote-preview .quote-summary .quote-total div strong {
+            color: #111;
+        }
+
+        .quote-preview .quote-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            font-size: 13px;
+            color: #4B5563;
+            line-height: 1.6;
+        }
+
+        .quote-preview .quote-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quote-preview .quote-actions .button {
+            padding: 10px 18px;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #quote-preview, #quote-preview * {
+                visibility: visible;
+            }
+            #quote-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+        }
+
         @media (max-width: 1200px) {
             .stats-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -788,6 +931,198 @@
                 Object.keys(app.state.dropdowns).forEach(key => {
                     localStorage.setItem(`quote_system_dropdown_${key}`, JSON.stringify(app.state.dropdowns[key]));
                 });
+            },
+
+            initializeQuoteDraft() {
+                if (app.state.quoteDraft) return app.state.quoteDraft;
+
+                const today = helpers.today();
+                const validDays = 30;
+                const defaultUnit = app.state.dropdowns?.units?.[0] || 'unit';
+
+                app.state.quoteDraft = {
+                    id: helpers.generateId(),
+                    client_id: '',
+                    client_name: '',
+                    client_company: '',
+                    quote_date: today,
+                    valid_days: validDays,
+                    valid_until: helpers.addDays(today, validDays),
+                    include_vat: true,
+                    vat_rate: 16,
+                    subtotal: '0.00',
+                    vat_amount: '0.00',
+                    total: '0.00',
+                    status: 'draft',
+                    notes: '',
+                    number: '',
+                    items: [
+                        {
+                            id: helpers.generateId(),
+                            name: '',
+                            description: '',
+                            quantity: 1,
+                            unit: defaultUnit,
+                            unit_price: '0.00',
+                            margin: 20,
+                        }
+                    ]
+                };
+                return app.state.quoteDraft;
+            },
+
+            updateQuoteTotals(quote) {
+                if (!quote) quote = app.initializeQuoteDraft();
+
+                const subtotal = quote.items.reduce((sum, item) => {
+                    const quantity = Number(item.quantity) || 0;
+                    const unit_price = Number(item.unit_price) || 0;
+                    return sum + (quantity * unit_price);
+                }, 0);
+
+                const vatRate = Number(quote.vat_rate) || 0;
+                const vatAmount = quote.include_vat ? (subtotal * vatRate / 100) : 0;
+                const total = subtotal + vatAmount;
+
+                quote.subtotal = subtotal.toFixed(2);
+                quote.vat_amount = vatAmount.toFixed(2);
+                quote.total = total.toFixed(2);
+            },
+
+            handleQuoteClientSelect(e) {
+                const clientId = e.currentTarget.value;
+                const quote = app.initializeQuoteDraft();
+                quote.client_id = clientId;
+
+                const client = app.state.clients.find(c => c.id === clientId);
+                if (client) {
+                    quote.client_name = client.name || '';
+                    quote.client_company = client.company || '';
+                }
+                app.render();
+            },
+
+            handleQuoteInputChange(field, value) {
+                const quote = app.initializeQuoteDraft();
+
+                if (field === 'quote_date') {
+                    quote.quote_date = value;
+                    quote.valid_until = helpers.addDays(value, Number(quote.valid_days) || 0);
+                } else if (field === 'valid_days') {
+                    quote.valid_days = Number(value) || 0;
+                    quote.valid_until = helpers.addDays(quote.quote_date, Number(quote.valid_days));
+                } else if (field === 'include_vat') {
+                    quote.include_vat = value === 'true' || value === true || value === '1';
+                } else if (field === 'vat_rate') {
+                    quote.vat_rate = Number(value) || 0;
+                } else if (field === 'status') {
+                    quote.status = value;
+                } else if (field === 'notes') {
+                    quote.notes = value;
+                } else if (field === 'client_name') {
+                    quote.client_name = value;
+                    quote.client_id = '';
+                } else if (field === 'client_company') {
+                    quote.client_company = value;
+                }
+
+                app.updateQuoteTotals(quote);
+                app.render();
+            },
+
+            handleQuoteItemChange(itemId, field, value) {
+                const quote = app.initializeQuoteDraft();
+                const item = quote.items.find(i => i.id === itemId);
+                if (!item) return;
+
+                if (field === 'quantity' || field === 'margin') {
+                    item[field] = Number(value) || 0;
+                } else if (field === 'unit_price') {
+                    item[field] = value;
+                } else {
+                    item[field] = value;
+                }
+
+                app.updateQuoteTotals(quote);
+                app.render();
+            },
+
+            addQuoteItem() {
+                const quote = app.initializeQuoteDraft();
+                quote.items.push({
+                    id: helpers.generateId(),
+                    name: '',
+                    description: '',
+                    quantity: 1,
+                    unit: app.state.dropdowns?.units?.[0] || 'unit',
+                    unit_price: '0.00',
+                    margin: 20,
+                });
+                app.render();
+            },
+
+            removeQuoteItem(itemId) {
+                const quote = app.initializeQuoteDraft();
+                if (quote.items.length <= 1) return;
+                quote.items = quote.items.filter(item => item.id !== itemId);
+                app.updateQuoteTotals(quote);
+                app.render();
+            },
+
+            async handleSaveQuote() {
+                const quote = app.initializeQuoteDraft();
+                if (!quote.client_name.trim()) {
+                    app.notify('Please choose a client or enter a client name', 'error');
+                    return;
+                }
+                if (!quote.quote_date) {
+                    app.notify('Quote date is required', 'error');
+                    return;
+                }
+                if (!quote.items.length) {
+                    app.notify('Add at least one quote item', 'error');
+                    return;
+                }
+
+                const payload = {
+                    client_id: quote.client_id,
+                    client_name: quote.client_name,
+                    client_company: quote.client_company,
+                    quote_date: quote.quote_date,
+                    valid_days: Number(quote.valid_days) || 0,
+                    valid_until: quote.valid_until,
+                    subtotal: Number(quote.subtotal) || 0,
+                    vat_rate: Number(quote.vat_rate) || 0,
+                    vat_amount: Number(quote.vat_amount) || 0,
+                    total: Number(quote.total) || 0,
+                    include_vat: quote.include_vat,
+                    status: quote.status || 'draft',
+                    notes: quote.notes || '',
+                    items: quote.items.map(item => ({
+                        name: item.name,
+                        description: item.description,
+                        quantity: Number(item.quantity) || 0,
+                        unit: item.unit,
+                        unit_price: Number(item.unit_price) || 0,
+                        margin: Number(item.margin) || 0,
+                    }))
+                };
+
+                const result = await API.quotes.create(payload);
+                if (result.success) {
+                    quote.id = result.id;
+                    quote.number = result.number;
+                    app.notify(`Quote ${result.number} saved`, 'success');
+                    await app.loadAppData();
+                    app.state.quoteDraft = quote;
+                    app.render();
+                } else {
+                    app.notify(result.error || 'Failed to save quote', 'error');
+                }
+            },
+
+            handlePrintQuote() {
+                window.print();
             },
 
             handleDropdownAdd(type) {
@@ -1216,6 +1551,48 @@
                 const modalSaveButton = document.querySelector('.catalog-modal-save');
                 if (modalSaveButton) {
                     modalSaveButton.addEventListener('click', app.saveCatalogModal);
+                }
+
+                const quoteClientSelect = document.getElementById('quote-client-select');
+                if (quoteClientSelect) {
+                    quoteClientSelect.addEventListener('change', app.handleQuoteClientSelect);
+                }
+
+                document.querySelectorAll('[data-quote-field]').forEach(element => {
+                    element.addEventListener('input', (e) => {
+                        const field = e.currentTarget.dataset.quoteField;
+                        app.handleQuoteInputChange(field, e.currentTarget.type === 'checkbox' ? e.currentTarget.checked : e.currentTarget.value);
+                    });
+                });
+
+                document.querySelectorAll('[data-quote-item-field]').forEach(element => {
+                    element.addEventListener('input', (e) => {
+                        const itemId = e.currentTarget.dataset.itemId;
+                        const field = e.currentTarget.dataset.quoteItemField;
+                        app.handleQuoteItemChange(itemId, field, e.currentTarget.value);
+                    });
+                });
+
+                document.querySelectorAll('.quote-item-remove-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const itemId = e.currentTarget.dataset.itemId;
+                        app.removeQuoteItem(itemId);
+                    });
+                });
+
+                const addQuoteItemBtn = document.getElementById('quote-add-item');
+                if (addQuoteItemBtn) {
+                    addQuoteItemBtn.addEventListener('click', app.addQuoteItem);
+                }
+
+                const saveQuoteBtn = document.getElementById('quote-save-btn');
+                if (saveQuoteBtn) {
+                    saveQuoteBtn.addEventListener('click', app.handleSaveQuote);
+                }
+
+                const printQuoteBtn = document.getElementById('quote-print-btn');
+                if (printQuoteBtn) {
+                    printQuoteBtn.addEventListener('click', app.handlePrintQuote);
                 }
 
                 // Logout
