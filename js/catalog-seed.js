@@ -286,7 +286,7 @@
             unit: 'unit',
         },
 
-        // ── FLOWERS ───────────────────────────────────────────
+        // FLOWERS 
         {
             name: 'Reception Entrance Florals',
             category: 'Flowers',
