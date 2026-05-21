@@ -212,6 +212,22 @@ export function renderNewQuote(state, helpers) {
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>Statement title</label>
+                            <input id="quote-title" data-quote-field="title" class="input-field" type="text" value="${quote.title || ''}" placeholder="E.g. Event quotation">
+                        </div>
+                        <div class="form-group">
+                            <label>Venue</label>
+                            <input id="quote-venue" data-quote-field="venue" class="input-field" type="text" value="${quote.venue || ''}" placeholder="Venue or location">
+                        </div>
+                        <div class="form-group">
+                            <label>No of guests</label>
+                            <input id="quote-guests" data-quote-field="guests" class="input-field" type="text" value="${quote.guests || ''}" placeholder="Number of guests">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact person</label>
+                            <input id="quote-contact-person" data-quote-field="contact_person" class="input-field" type="text" value="${quote.contact_person || ''}" placeholder="Contact person name">
+                        </div>
+                        <div class="form-group">
                             <label>Quote date</label>
                             <input id="quote-date" data-quote-field="quote_date" class="input-field" type="date" value="${quote.quote_date}">
                         </div>
@@ -222,14 +238,6 @@ export function renderNewQuote(state, helpers) {
                         <div class="form-group">
                             <label>Valid until</label>
                             <input id="quote-valid-until" class="input-field" type="date" value="${quote.valid_until}" disabled>
-                        </div>
-                        <div class="form-group full">
-                            <label>Client name</label>
-                            <input id="quote-client-name" data-quote-field="client_name" class="input-field" type="text" value="${quote.client_name}" placeholder="Client full name">
-                        </div>
-                        <div class="form-group full">
-                            <label>Client company</label>
-                            <input id="quote-client-company" data-quote-field="client_company" class="input-field" type="text" value="${quote.client_company}" placeholder="Company name">
                         </div>
                         <div class="form-group">
                             <label>VAT included</label>
@@ -262,6 +270,7 @@ export function renderNewQuote(state, helpers) {
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Category</th>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Qty</th>
@@ -272,7 +281,7 @@ export function renderNewQuote(state, helpers) {
                                 </tr>
                             </thead>
                             <tbody>
-                                ${renderQuoteItems(quote, units)}
+                                ${renderQuoteItems(quote, units, state.dropdowns?.categories || ['General'])}
                             </tbody>
                         </table>
                     </div>
