@@ -476,11 +476,12 @@
         .quote-preview {
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 22px;
+            padding: 24px;
             min-height: 680px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
+            background: #fff;
         }
 
         .quote-preview .quote-header {
@@ -490,29 +491,47 @@
             align-items: flex-start;
         }
 
-        .quote-preview .quote-header h3 {
-            margin-bottom: 8px;
-            font-size: 22px;
-            letter-spacing: 0.02em;
+        .quote-branding {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .quote-preview .quote-meta,
-        .quote-preview .quote-client,
-        .quote-preview .quote-summary {
+        .quote-logo {
+            width: 68px;
+            height: 68px;
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            place-items: center;
+            background: #f8fafc;
+            border-radius: 50%;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .quote-contact {
+            text-align: right;
+            font-size: 12px;
+            color: #4B5563;
+            line-height: 1.5;
+        }
+
+        .quote-top-details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
+            padding: 18px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
-        .quote-preview .quote-meta div,
-        .quote-preview .quote-client div,
-        .quote-preview .quote-summary div {
-            font-size: 13px;
+        .quote-top-details div {
+            font-size: 12px;
             color: #374151;
+            line-height: 1.6;
         }
 
-        .quote-preview .quote-meta div strong,
-        .quote-preview .quote-summary div strong {
+        .quote-top-details strong {
             display: block;
             font-weight: 700;
             color: #111;
@@ -523,38 +542,52 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
+            font-size: 12px;
         }
 
         .quote-preview table.quote-table th,
         .quote-preview table.quote-table td {
             padding: 10px 12px;
             border: 1px solid var(--border);
-            font-size: 13px;
         }
 
         .quote-preview table.quote-table th {
-            background: #F8FAFC;
-            color: #374151;
+            background: #7C2D12;
+            color: #fff;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+        }
+
+        .quote-preview table.quote-table td {
+            color: #374151;
+            vertical-align: top;
+        }
+
+        .quote-table-section-row td {
+            background: #7C2D12;
+            color: #fff;
+            font-weight: 700;
+            padding: 10px 12px;
         }
 
         .quote-preview .quote-summary {
+            display: grid;
             grid-template-columns: 1fr auto;
-            gap: 12px;
-            align-items: end;
+            gap: 14px;
+            align-items: start;
         }
 
         .quote-preview .quote-summary .quote-total {
             display: grid;
             gap: 8px;
-            min-width: 220px;
+            min-width: 240px;
         }
 
         .quote-preview .quote-summary .quote-total div {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 13px;
             color: #374151;
         }
 
@@ -562,18 +595,31 @@
             color: #111;
         }
 
+        .quote-terms-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #111;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
         .quote-preview .quote-footer {
             border-top: 1px solid var(--border);
-            padding-top: 14px;
-            font-size: 13px;
+            padding-top: 16px;
+            font-size: 12px;
             color: #4B5563;
-            line-height: 1.6;
+            line-height: 1.7;
+        }
+
+        .quote-preview .quote-footer div {
+            margin-bottom: 6px;
         }
 
         .quote-preview .quote-actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            margin-top: auto;
         }
 
         .quote-preview .quote-actions .button {
@@ -1025,6 +1071,14 @@
                     quote.status = value;
                 } else if (field === 'notes') {
                     quote.notes = value;
+                } else if (field === 'title') {
+                    quote.title = value;
+                } else if (field === 'venue') {
+                    quote.venue = value;
+                } else if (field === 'guests') {
+                    quote.guests = value;
+                } else if (field === 'contact_person') {
+                    quote.contact_person = value;
                 } else if (field === 'client_name') {
                     quote.client_name = value;
                     quote.client_id = '';
@@ -1094,6 +1148,10 @@
                     client_id: quote.client_id,
                     client_name: quote.client_name,
                     client_company: quote.client_company,
+                    title: quote.title || '',
+                    venue: quote.venue || '',
+                    guests: quote.guests || '',
+                    contact_person: quote.contact_person || '',
                     quote_date: quote.quote_date,
                     valid_days: Number(quote.valid_days) || 0,
                     valid_until: quote.valid_until,
@@ -1107,6 +1165,7 @@
                     items: quote.items.map(item => ({
                         name: item.name,
                         description: item.description,
+                        category: item.category || '',
                         quantity: Number(item.quantity) || 0,
                         unit: item.unit,
                         unit_price: Number(item.unit_price) || 0,
