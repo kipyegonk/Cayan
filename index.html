@@ -609,10 +609,26 @@
             font-size: 12px;
             color: #4B5563;
             line-height: 1.7;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
 
         .quote-preview .quote-footer div {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+        }
+
+        .quote-preview .quote-signature {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 10px;
+        }
+
+        .quote-preview .quote-signature-date {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #4B5563;
         }
 
         .quote-preview .quote-actions {
@@ -624,6 +640,133 @@
 
         .quote-preview .quote-actions .button {
             padding: 10px 18px;
+        }
+
+        .quote-preview .quote-header {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .quote-preview .quote-contact {
+            text-align: left;
+        }
+
+        .quote-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin: 0 auto;
+            color: #111827;
+        }
+
+        .quote-top-details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            padding: 16px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .quote-top-details div {
+            font-size: 12px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .quote-top-details strong {
+            display: block;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .quote-preview table.quote-table th,
+        .quote-preview table.quote-table td {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+        }
+
+        .quote-preview table.quote-table th {
+            background: #7C2D12;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-align: left;
+        }
+
+        .quote-preview table.quote-table td {
+            color: #374151;
+            vertical-align: top;
+        }
+
+        .quote-table-section-row td {
+            background: #7C2D12;
+            color: #fff;
+            font-weight: 700;
+            padding: 10px 12px;
+        }
+
+        .quote-table-category-total-row td {
+            border-top: 2px solid #7C2D12;
+            background: #FDF2F2;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .quote-table-category-total-row td:first-child {
+            border: none;
+        }
+
+        .quote-table-category-total-row td:nth-child(3),
+        .quote-table-category-total-row td:nth-child(4) {
+            text-align: right;
+        }
+
+        .quote-preview .quote-summary {
+            display: grid;
+            grid-template-columns: 1fr minmax(240px, 340px);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .quote-preview .quote-summary .quote-total {
+            display: grid;
+            gap: 10px;
+            padding: 18px;
+            border: 1px solid #7C2D12;
+            background: #FEF3F2;
+        }
+
+        .quote-preview .quote-summary .quote-total div {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .quote-preview .quote-summary .quote-total div strong {
+            color: #111827;
+        }
+
+        .quote-preview .quote-summary .quote-total-final {
+            margin-top: 8px;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+        }
+
+        .quote-terms-list {
+            padding-left: 18px;
+            margin: 0;
+            color: #4B5563;
+            font-size: 12px;
+            line-height: 1.7;
+            list-style: square inside;
         }
 
         @media print {
@@ -639,6 +782,9 @@
                 top: 0;
                 width: 100%;
                 box-shadow: none;
+            }
+            .quote-preview .quote-actions {
+                display: none !important;
             }
         }
 
