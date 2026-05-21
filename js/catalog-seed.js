@@ -76,7 +76,7 @@
             unit: 'unit',
         },
 
-        // ── TENT & DÉCOR ──────────────────────────────────────
+        // TENT & DÉCOR
         {
             name: 'A-Frame Tent (9 sections)',
             category: 'Tent & Décor',
