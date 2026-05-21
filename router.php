@@ -14,5 +14,4 @@ if (strpos($uri, '/api/') === 0 || strpos($uri, '/q/api/') === 0) {
     return true;
 }
 
-// Let the built-in server handle other requests (static files or index.html)
 return false;
