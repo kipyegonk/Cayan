@@ -1,318 +1,106 @@
-function createDefaultDraft(state, helpers) {
-    const today = helpers.today();
-    const validDays = 30;
-    const defaultUnit = state.dropdowns?.units?.[0] || 'unit';
+export function generateQuotePreview(quoteData, company, helpers) {
+    const sections = {};
+    let subtotal = 0;
 
-    return {
-        id: helpers.generateId(),
-        client_id: '',
-        client_name: '',
-        client_company: '',
-        title: '',
-        venue: '',
-        guests: '',
-        contact_person: '',
-        quote_date: today,
-        valid_days: validDays,
-        valid_until: helpers.addDays(today, validDays),
-        include_vat: true,
-        vat_rate: 16,
-        subtotal: '0.00',
-        vat_amount: '0.00',
-        total: '0.00',
-        status: 'draft',
-        notes: '',
-        number: '',
-        items: [
-            {
-                id: helpers.generateId(),
-                name: '',
-                description: '',
-                category: state.dropdowns?.categories?.[0] || 'General',
-                quantity: 1,
-                unit: defaultUnit,
-                unit_price: '0.00',
-                margin: 20,
-            }
-        ]
-    };
-}
+    quoteData.items.forEach(item => {
+        if (!sections[item.category]) sections[item.category] = [];
+        sections[item.category].push(item);
+        subtotal += item.quantity * item.unit_price;
+    });
 
-function renderClientOptions(clients, quote) {
-    const options = [`<option value="">Select client</option>`];
-    if (Array.isArray(clients)) {
-        options.push(...clients.map(client => `
-            <option value="${client.id}" ${client.id === quote.client_id ? 'selected' : ''}>
-                ${client.name} ${client.company ? `(${client.company})` : ''}
-            </option>
-        `));
-    }
-    return options.join('');
-}
+    let html = `
+        <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 30px; border: 1px solid #ddd;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="margin: 0;">Cayan Events</h1>
+                <p>Quotation for ${quoteData.client_name}</p>
+            </div>
 
-function renderQuoteItems(quote, units, categories) {
-    return quote.items.map(item => `
-        <tr class="quote-item-row">
-            <td>
-                <select data-item-id="${item.id}" data-quote-item-field="category" class="input-field">
-                    ${categories.map(category => `<option value="${category}" ${category === item.category ? 'selected' : ''}>${category}</option>`).join('')}
-                </select>
-            </td>
-            <td><input data-item-id="${item.id}" data-quote-item-field="name" class="input-field" type="text" value="${item.name}" placeholder="Item name"></td>
-            <td><input data-item-id="${item.id}" data-quote-item-field="description" class="input-field" type="text" value="${item.description}" placeholder="Description"></td>
-            <td><input data-item-id="${item.id}" data-quote-item-field="quantity" class="input-field" type="number" min="1" value="${item.quantity}"></td>
-            <td>
-                <select data-item-id="${item.id}" data-quote-item-field="unit" class="input-field">
-                    ${units.map(unit => `<option value="${unit}" ${unit === item.unit ? 'selected' : ''}>${unit}</option>`).join('')}
-                </select>
-            </td>
-            <td><input data-item-id="${item.id}" data-quote-item-field="unit_price" class="input-field" type="number" min="0" step="0.01" value="${item.unit_price}"></td>
-            <td><input data-item-id="${item.id}" data-quote-item-field="margin" class="input-field" type="number" min="0" max="100" value="${item.margin}"></td>
-            <td class="text-center">
-                <button type="button" class="button secondary quote-item-remove-btn" data-item-id="${item.id}">Remove</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderQuotePreview(quote, company, helpers) {
-    const currency = company.currency || 'KES';
-    const companyName = company.name || 'Your Company';
-    const companyEmail = company.email || 'email@company.com';
-    const companyPhone = company.phone || '+254 700 000 000';
-    const companyAddress = company.address || 'Company address';
-    const paymentTerms = company.terms || 'Payment due within 30 days from invoice date.';
-
-    const groupedItems = (quote.items || []).reduce((groups, item) => {
-        const category = item.category || 'General';
-        if (!groups[category]) groups[category] = [];
-        groups[category].push(item);
-        return groups;
-    }, {});
-
-    const itemRows = Object.keys(groupedItems).map(category => {
-        const categoryTotal = groupedItems[category].reduce((sum, item) => {
-            return sum + ((Number(item.quantity) || 0) * (Number(item.unit_price) || 0));
-        }, 0);
-
-        return `
-            <tr class="quote-table-section-row">
-                <td colspan="4">${category}</td>
-            </tr>
-            ${groupedItems[category].map(item => {
-                const lineTotal = (Number(item.quantity) || 0) * (Number(item.unit_price) || 0);
+            ${Object.keys(sections).map(section => {
+                const items = sections[section];
+                const sectionTotal = items.reduce((sum, i) => sum + (i.quantity * i.unit_price), 0);
+                
                 return `
-                    <tr>
-                        <td class="text-center">${item.quantity || 0}</td>
-                        <td>
-                            <div class="item-name">${item.name || '—'}</div>
-                            ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
-                        </td>
-                        <td class="text-right">${helpers.formatMoney(item.unit_price, currency)}</td>
-                        <td class="text-right">${helpers.formatMoney(lineTotal, currency)}</td>
-                    </tr>
-                `;
-            }).join('')}
-            <tr class="quote-table-category-total-row">
-                <td colspan="2"></td>
-                <td class="text-right"><strong>${category} total</strong></td>
-                <td class="text-right">${helpers.formatMoney(categoryTotal, currency)}</td>
-            </tr>
-        `;
-    }).join('');
-
-    return `
-        <div class="quote-preview" id="quote-preview">
-            <div class="quote-header">
-                <div class="quote-branding">
-                    <div class="quote-logo">${companyName.charAt(0) || 'Q'}</div>
-                    <div>
-                        <div style="font-size: 18px; font-weight: 800; letter-spacing: 0.08em;">${companyName}</div>
-                        <div style="font-size: 13px; color: #4B5563; margin-top: 4px;">${companyAddress}</div>
-                    </div>
-                </div>
-                <div class="quote-contact">
-                    <div><strong>Phone</strong> ${companyPhone}</div>
-                    <div><strong>Email</strong> ${companyEmail}</div>
-                    <div><strong>Address</strong> ${companyAddress}</div>
-                </div>
-            </div>
-
-            <div class="quote-title">QUOTATION</div>
-
-            <div class="quote-top-details">
-                <div>
-                    <div><strong>Statement No</strong></div>
-                    <div>${quote.number || 'Draft'}</div>
-                    <div style="margin-top: 12px;"><strong>Date</strong></div>
-                    <div>${helpers.formatDate(quote.quote_date)}</div>
-                </div>
-                <div>
-                    <div><strong>Title</strong></div>
-                    <div>${quote.title || '-'}</div>
-                    <div style="margin-top: 12px;"><strong>Venue</strong></div>
-                    <div>${quote.venue || '-'}</div>
-                </div>
-                <div>
-                    <div><strong>No of Guests</strong></div>
-                    <div>${quote.guests || '-'}</div>
-                    <div style="margin-top: 12px;"><strong>Contact Person</strong></div>
-                    <div>${quote.contact_person || (quote.client_name || '-')}</div>
-                </div>
-            </div>
-
-            <table class="quote-table">
-                <thead>
-                    <tr>
-                        <th style="width: 70px;">Qty</th>
-                        <th>Description</th>
-                        <th style="width: 140px;">Unit Price</th>
-                        <th style="width: 140px;">Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemRows || '<tr><td colspan="4" style="padding: 20px; text-align:center; color:#6B7280;">No quote items added yet.</td></tr>'}
-                </tbody>
-            </table>
-
-            <div class="quote-summary">
-                <div>
-                    <div class="quote-terms-title">Terms and Conditions</div>
-                    <ul class="quote-terms-list">
-                        <li>Full payment before delivery.</li>
-                        <li>Cayan Events Ke. is responsible for supplying and arranging the above facilities.</li>
-                        <li>The client agrees to the full deposit and any cancellation charges.</li>
-                        <li>The client is responsible for all event permits and venue approvals.</li>
-                    </ul>
-                </div>
-                <div class="quote-total">
-                    <div><span>SUBTOTAL</span><strong>${helpers.formatMoney(quote.subtotal, currency)}</strong></div>
-                    <div><span>VAT ${quote.vat_rate}%</span><strong>${helpers.formatMoney(quote.vat_amount, currency)}</strong></div>
-                    <div class="quote-total-final"><span>TOTAL VAT INC.</span><strong>${helpers.formatMoney(quote.total, currency)}</strong></div>
-                </div>
-            </div>
-
-            <div class="quote-footer">
-                <div>Regards,</div>
-                <div class="quote-signature">${quote.contact_person || quote.client_name || 'Contact Name'}</div>
-                <div class="quote-signature-date">Date: ${helpers.formatDate(quote.quote_date)}</div>
-            </div>
-
-            <div class="quote-actions">
-                <button type="button" id="quote-print-btn" class="button secondary">Print Preview</button>
-                <button type="button" id="quote-save-btn" class="button green">Save Quote</button>
-            </div>
-        </div>
-    `;
-}
-
-export function renderNewQuote(state, helpers) {
-    if (!state.quoteDraft) {
-        state.quoteDraft = createDefaultDraft(state, helpers);
-    }
-
-    const quote = state.quoteDraft;
-    const units = state.dropdowns?.units || ['unit', 'hr', 'lot', 'project', 'year'];
-
-    return `
-        <div style="max-width: 1200px;">
-            <div class="page-header">
-                <div>
-                    <h2 class="page-title">New Quote</h2>
-                    <p class="page-subtitle">Build a quote and preview the final output before saving.</p>
-                </div>
-            </div>
-
-            <div class="quote-layout">
-                <div class="quote-card quote-section">
-                    <div class="page-subtitle" style="font-weight: 700; margin-bottom: 12px;">Quote details</div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Client</label>
-                            <select id="quote-client-select" class="input-field">
-                                ${renderClientOptions(state.clients, quote)}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Statement title</label>
-                            <input id="quote-title" data-quote-field="title" class="input-field" type="text" value="${quote.title || ''}" placeholder="E.g. Event quotation">
-                        </div>
-                        <div class="form-group">
-                            <label>Venue</label>
-                            <input id="quote-venue" data-quote-field="venue" class="input-field" type="text" value="${quote.venue || ''}" placeholder="Venue or location">
-                        </div>
-                        <div class="form-group">
-                            <label>No of guests</label>
-                            <input id="quote-guests" data-quote-field="guests" class="input-field" type="text" value="${quote.guests || ''}" placeholder="Number of guests">
-                        </div>
-                        <div class="form-group">
-                            <label>Contact person</label>
-                            <input id="quote-contact-person" data-quote-field="contact_person" class="input-field" type="text" value="${quote.contact_person || ''}" placeholder="Contact person name">
-                        </div>
-                        <div class="form-group">
-                            <label>Quote date</label>
-                            <input id="quote-date" data-quote-field="quote_date" class="input-field" type="date" value="${quote.quote_date}">
-                        </div>
-                        <div class="form-group">
-                            <label>Valid days</label>
-                            <input id="quote-valid-days" data-quote-field="valid_days" class="input-field" type="number" min="1" value="${quote.valid_days}">
-                        </div>
-                        <div class="form-group">
-                            <label>Valid until</label>
-                            <input id="quote-valid-until" class="input-field" type="date" value="${quote.valid_until}" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>VAT included</label>
-                            <select id="quote-include-vat" data-quote-field="include_vat" class="input-field">
-                                <option value="true" ${quote.include_vat ? 'selected' : ''}>Yes</option>
-                                <option value="false" ${!quote.include_vat ? 'selected' : ''}>No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>VAT rate</label>
-                            <input id="quote-vat-rate" data-quote-field="vat_rate" class="input-field" type="number" min="0" max="100" value="${quote.vat_rate}">
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select id="quote-status" data-quote-field="status" class="input-field">
-                                <option value="draft" ${quote.status === 'draft' ? 'selected' : ''}>Draft</option>
-                                <option value="pending" ${quote.status === 'pending' ? 'selected' : ''}>Pending</option>
-                                <option value="accepted" ${quote.status === 'accepted' ? 'selected' : ''}>Accepted</option>
-                                <option value="declined" ${quote.status === 'declined' ? 'selected' : ''}>Declined</option>
-                            </select>
-                        </div>
-                        <div class="form-group full">
-                            <label>Notes</label>
-                            <textarea id="quote-notes" data-quote-field="notes" class="input-field" rows="4" placeholder="Enter special instructions or payment notes">${quote.notes}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="page-subtitle" style="font-weight: 700; margin-top: 16px;">Quote items</div>
-                    <div style="overflow-x: auto;">
-                        <table>
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="background:#f8f9fa; padding:8px 12px; margin:0;">${section}</h3>
+                        <table style="width:100%; border-collapse: collapse;">
                             <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Qty</th>
-                                    <th>Unit</th>
-                                    <th>Unit Price</th>
-                                    <th>Margin</th>
-                                    <th></th>
+                                <tr style="background:#f1f1f1;">
+                                    <th style="text-align:left; padding:8px;">Description</th>
+                                    <th style="text-align:right; padding:8px;">Qty</th>
+                                    <th style="text-align:right; padding:8px;">Unit Price</th>
+                                    <th style="text-align:right; padding:8px;">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${renderQuoteItems(quote, units, state.dropdowns?.categories || ['General'])}
+                                ${items.map(item => `
+                                    <tr>
+                                        <td style="padding:8px; border-bottom:1px solid #eee;">${item.name}</td>
+                                        <td style="text-align:right; padding:8px;">${item.quantity}</td>
+                                        <td style="text-align:right; padding:8px;">${helpers.formatMoney(item.unit_price)}</td>
+                                        <td style="text-align:right; padding:8px;">${helpers.formatMoney(item.quantity * item.unit_price)}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr style="font-weight:bold; background:#f9f9f9;">
+                                    <td colspan="3" style="text-align:right; padding:8px;">Section Total:</td>
+                                    <td style="text-align:right; padding:8px;">${helpers.formatMoney(sectionTotal)}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <button type="button" id="quote-add-item" class="button secondary" style="width: fit-content; margin-top: 14px;">+ Add item</button>
-                </div>
+                `;
+            }).join('')}
 
-                <div class="quote-section">
-                    ${renderQuotePreview(quote, state.company, helpers)}
+            <div style="text-align:right; margin-top:20px; font-size:1.1em;">
+                <strong>Grand Total: ${helpers.formatMoney(subtotal)}</strong>
+            </div>
+
+            <div style="margin-top:40px; font-size:0.9em; color:#555;">
+                <strong>Terms & Conditions:</strong><br>
+                ${company.terms || 'Payment due within 30 days.'}
+            </div>
+        </div>
+    `;
+
+    return html;
+}
+
+export function renderNewQuote(state, helpers) {
+    const catalog = state.catalog || [];
+    const grouped = {};
+
+    catalog.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+    });
+
+    return `
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div class="page-header">
+                <h2 class="page-title">Create New Quotation</h2>
+            </div>
+            <div class="quote-builder" style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 18px;">
+                <div class="catalog-panel card" style="padding: 20px;">
+                    <h3 style="margin-top:0;">Select Items</h3>
+                    ${Object.keys(grouped).map(cat => `
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px;">${cat}</h4>
+                            <div style="display:grid; gap:10px;">
+                                ${grouped[cat].map(item => `
+                                    <div class="catalog-item" style="padding:12px; border:1px solid #e5e7eb; border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                                        <div>
+                                            <strong>${item.name}</strong><br>
+                                            <small>${helpers.formatMoney(item.cost_price)}</small>
+                                        </div>
+                                        <button class="button secondary" data-id="${item.id}">Add</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="quote-preview-panel card" style="padding: 20px;">
+                    <h3 style="margin-top:0;">Quote Preview</h3>
+                    <div id="live-quote-preview" style="min-height: 300px; color: #374151;">Select items to build your quote.</div>
                 </div>
             </div>
         </div>
