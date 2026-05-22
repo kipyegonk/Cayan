@@ -957,6 +957,7 @@
                 users: [],
                 previewQuote: null,
                 catalogModal: null,
+                clientModal: null,
                 dropdowns: null,
             },
 
@@ -1077,6 +1078,95 @@
                 }
             },
 
+            handleClientsAdd() {
+                app.state.clientModal = {
+                    edit: false,
+                    client: {
+                        name: '',
+                        company: '',
+                        contact_person: '',
+                        email: '',
+                        phone: '',
+                        address: '',
+                        vat: ''
+                    }
+                };
+                app.render();
+            },
+
+            handleClientEdit(clientId) {
+                const client = app.state.clients.find(c => c.id === clientId);
+                if (!client) {
+                    app.notify('Client not found', 'error');
+                    return;
+                }
+                app.state.clientModal = {
+                    edit: true,
+                    client: {
+                        id: client.id,
+                        name: client.name || '',
+                        company: client.company || '',
+                        contact_person: client.contact_person || '',
+                        email: client.email || '',
+                        phone: client.phone || '',
+                        address: client.address || '',
+                        vat: client.vat || ''
+                    }
+                };
+                app.render();
+            },
+
+            async handleClientDelete(clientId) {
+                const confirmed = window.confirm('Delete this client?');
+                if (!confirmed) return;
+
+                const result = await API.clients.delete(clientId);
+                if (result.success) {
+                    app.notify('Client deleted', 'success');
+                    app.loadAppData();
+                } else {
+                    app.notify(result.error || 'Failed to delete client', 'error');
+                }
+            },
+
+            closeClientModal() {
+                app.state.clientModal = null;
+                app.render();
+            },
+
+            async saveClientModal() {
+                if (!app.state.clientModal) return;
+
+                const name = document.getElementById('client-name')?.value.trim();
+                const company = document.getElementById('client-company')?.value.trim();
+                const contact_person = document.getElementById('client-contact_person')?.value.trim();
+                const email = document.getElementById('client-email')?.value.trim();
+                const phone = document.getElementById('client-phone')?.value.trim();
+                const address = document.getElementById('client-address')?.value.trim();
+                const vat = document.getElementById('client-vat')?.value.trim();
+
+                if (!name) {
+                    app.notify('Client name is required', 'error');
+                    return;
+                }
+
+                const payload = { name, company, contact_person, email, phone, address, vat };
+                let result;
+                if (app.state.clientModal.edit) {
+                    result = await API.clients.update(app.state.clientModal.client.id, payload);
+                } else {
+                    result = await API.clients.create(payload);
+                }
+
+                if (result.success) {
+                    app.notify(app.state.clientModal.edit ? 'Client updated' : 'Client created', 'success');
+                    app.closeClientModal();
+                    app.loadAppData();
+                } else {
+                    app.notify(result.error || 'Failed to save client', 'error');
+                }
+            },
+
             async loadAppData() {
                 app.loadDropdownSettings();
 
@@ -1095,6 +1185,7 @@
                 app.state.stats = stats || {};
                 app.state.loading = false;
                 app.state.catalogModal = null;
+                app.state.clientModal = null;
                 app.render();
             },
 
@@ -1490,6 +1581,58 @@
                 `;
             },
 
+            renderClientModal: () => {
+                const modal = app.state.clientModal;
+                if (!modal) return '';
+
+                const client = modal.client;
+
+                return `
+                    <div class="modal client-modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title">${modal.edit ? 'Edit Client' : 'Add Client'}</h3>
+                                <button class="modal-close client-modal-close">×</button>
+                            </div>
+                            <div class="form-grid" style="gap: 14px; margin-bottom: 16px;">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input id="client-name" class="input-field" type="text" value="${client.name}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Company</label>
+                                    <input id="client-company" class="input-field" type="text" value="${client.company}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Contact Person</label>
+                                    <input id="client-contact_person" class="input-field" type="text" value="${client.contact_person}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input id="client-email" class="input-field" type="email" value="${client.email}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone</label>
+                                    <input id="client-phone" class="input-field" type="text" value="${client.phone}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input id="client-address" class="input-field" type="text" value="${client.address}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>VAT Number</label>
+                                    <input id="client-vat" class="input-field" type="text" value="${client.vat}" />
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                                <button class="button secondary client-modal-close">Cancel</button>
+                                <button class="button green client-modal-save">${modal.edit ? 'Save changes' : 'Create client'}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
             render: () => {
                 const app_el = document.getElementById('app');
 
@@ -1522,6 +1665,9 @@
 
                 if (app.state.catalogModal) {
                     app_el.innerHTML += app.renderCatalogModal();
+                }
+                if (app.state.clientModal) {
+                    app_el.innerHTML += app.renderClientModal();
                 }
 
                 app.attachEventListeners();
@@ -1738,6 +1884,23 @@
                 document.querySelectorAll('.catalog-delete-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         app.handleCatalogDelete(e.currentTarget.dataset.id);
+                    });
+                });
+
+                const clientsAddBtn = document.querySelector('.clients-add-btn');
+                if (clientsAddBtn) {
+                    clientsAddBtn.addEventListener('click', app.handleClientsAdd);
+                }
+
+                document.querySelectorAll('.client-edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleClientEdit(e.currentTarget.dataset.id);
+                    });
+                });
+
+                document.querySelectorAll('.client-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        app.handleClientDelete(e.currentTarget.dataset.id);
                     });
                 });
 
