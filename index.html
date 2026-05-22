@@ -1932,6 +1932,16 @@
                     modalSaveButton.addEventListener('click', app.saveCatalogModal);
                 }
 
+                const clientModalCloseButtons = document.querySelectorAll('.client-modal-close');
+                clientModalCloseButtons.forEach(btn => {
+                    btn.addEventListener('click', app.closeClientModal);
+                });
+
+                const clientModalSaveButton = document.querySelector('.client-modal-save');
+                if (clientModalSaveButton) {
+                    clientModalSaveButton.addEventListener('click', app.saveClientModal);
+                }
+
                 const quoteClientSelect = document.getElementById('quote-client-select');
                 if (quoteClientSelect) {
                     quoteClientSelect.addEventListener('change', app.handleQuoteClientSelect);
