@@ -106,55 +106,65 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 .qp-meta { font-size: 8pt; line-height: 1.8; }
 .qp-meta strong { font-weight: 700; }
 /* --- Items table --- */
+/* Exact colours pixel-sampled from PDF:
+   - Column header bg:   #E8A598  salmon/coral, black text
+   - Section rows:       #E8A598  same salmon, black bold text
+   - Subsection rows:    #D9D9D9  light grey, black bold text
+   - Subtotal rows:      white bg, bold black
+   - Grand total row:    #E8A598  salmon, black bold
+   - Terms header pill:  #C0392B  dark red, white italic text
+   - Terms bullet:       ❑  (U+2751 hollow square dingbat)
+*/
 .qp-table {
   width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8pt;
 }
 .qp-table th {
-  background: #c0392b; color: #fff; padding: 5px 7px;
+  background: #E8A598; color: #000; padding: 5px 7px;
   text-align: left; font-weight: 700; font-size: 8pt;
-  border: 1px solid #a93226;
+  border: 1px solid #bbb;
 }
 .qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align: right; }
 .qp-table td {
-  padding: 3px 7px; border: 1px solid #ddd; vertical-align: top;
+  padding: 3px 7px; border: 1px solid #ccc; vertical-align: top;
 }
 .qp-table td:last-child, .qp-table td:nth-last-child(2) { text-align: right; white-space: nowrap; }
-/* Section header row */
+/* Section header row — salmon, black bold (CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS) */
 .qp-section-row td {
-  background: #c0392b; color: #fff; font-weight: 700;
-  padding: 4px 7px; font-size: 8pt; border: 1px solid #a93226;
+  background: #E8A598; color: #000; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #bbb;
 }
-/* Subsection header row (e.g. TENT AND DÉCOR, FLOWERS) */
+/* Subsection header row — light grey, black bold (TENT AND DÉCOR, subtotals labels) */
 .qp-subsection-row td {
-  background: #2c2c2c; color: #fff; font-weight: 700;
-  padding: 4px 7px; font-size: 8pt; border: 1px solid #222;
+  background: #D9D9D9; color: #000; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #bbb;
 }
 /* Subtotal row */
 .qp-subtotal-row td {
-  font-weight: 700; background: #f2f2f2;
-  border-top: 2px solid #bbb; padding: 4px 7px;
+  font-weight: 700; background: #fff; color: #111;
+  border: 1px solid #ccc; padding: 4px 7px;
 }
 /* Alternating rows */
 .qp-table tbody tr.even td { background: #fafafa; }
 /* Grand total block */
 .qp-totals-table {
-  width: 280px; margin-left: auto; margin-top: 8px; border-collapse: collapse; font-size: 9pt;
+  width: 300px; margin-left: auto; margin-top: 8px; border-collapse: collapse;
+  font-size: 9pt;
 }
-.qp-totals-table td { padding: 4px 8px; }
+.qp-totals-table td { padding: 4px 8px; border: 1px solid #ccc; }
 .qp-totals-table .total-label { font-weight: 700; }
-.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #c0392b; color: #fff; }
+.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #E8A598; color: #000; }
 /* --- Terms box --- */
 .qp-terms-header {
-  background: #c0392b; color: #fff; font-weight: 700;
-  padding: 5px 10px; font-size: 8.5pt; margin-top: 16px;
+  display: inline-block; background: #C0392B; color: #fff; font-style: italic;
+  padding: 4px 14px; font-size: 9pt; margin-top: 18px; border-radius: 3px;
 }
-.qp-terms-list { margin-top: 6px; padding-left: 0; list-style: none; }
+.qp-terms-list { margin-top: 10px; padding-left: 0; list-style: none; }
 .qp-terms-list li {
-  display: flex; gap: 8px; margin-bottom: 5px;
-  font-size: 7.5pt; line-height: 1.5; color: #222;
+  display: flex; gap: 8px; margin-bottom: 4px;
+  font-size: 8pt; line-height: 1.5; color: #111; align-items: flex-start;
 }
 .qp-terms-list li::before {
-  content: "■"; font-size: 8pt; flex-shrink: 0; margin-top: 1px;
+  content: "❑"; font-size: 10pt; flex-shrink: 0; line-height: 1.2; color: #111;
 }
 /* --- Signature --- */
 .qp-signature { margin-top: 32px; font-size: 9pt; }
@@ -679,7 +689,11 @@ const app = {
   renderNewQuote() {
     const clients = this.state.clients || [];
     const catalog = this.state.catalog || [];
-    return `<div style="max-width:900px;">
+    const catalogOpts = catalog.map(i =>
+      `<option value="${i.id}" data-name="${i.name}" data-price="${i.cost_price||0}" data-unit="${i.unit||''}">${i.name}${i.category?' ('+i.category+')':''}</option>`
+    ).join('');
+
+    return `<div style="max-width:960px;">
       <div class="page-header">
         <div><h2 class="page-title">New Quote</h2><p class="page-subtitle">Create a professional quotation</p></div>
       </div>
@@ -691,6 +705,10 @@ const app = {
               <option value="">-- Select Client --</option>
               ${clients.map(c => `<option value="${c.id}" data-name="${c.name}" data-contact="${c.contact_person||c.name}">${c.name}</option>`).join('')}
             </select>
+          </div>
+          <div class="form-group">
+            <label>Contact Person</label>
+            <input type="text" id="nq-contact" class="input-field" placeholder="Contact name" style="margin-bottom:0;">
           </div>
           <div class="form-group">
             <label>Venue</label>
@@ -708,53 +726,86 @@ const app = {
             <label>VAT Rate (%)</label>
             <input type="number" id="nq-vat" class="input-field" value="16" min="0" max="100" style="margin-bottom:0;">
           </div>
-          <div class="form-group">
-            <label>Contact Person</label>
-            <input type="text" id="nq-contact" class="input-field" placeholder="Contact name" style="margin-bottom:0;">
+        </div>
+
+        <!-- Catalog search row -->
+        <div style="background:#f0f4f8;border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+          <label style="margin-bottom:6px;">Search &amp; Add from Catalog</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="nq-catalog-search" class="input-field"
+              placeholder="Type to filter catalog items…"
+              style="flex:1;margin:0;" autocomplete="off">
+            <select id="nq-catalog-select" class="input-field" style="flex:2;margin:0;">
+              <option value="">-- pick an item --</option>
+              ${catalogOpts}
+            </select>
+            <input type="number" id="nq-catalog-qty" class="input-field"
+              placeholder="Qty" style="width:70px;margin:0;" min="1" value="1">
+            <button class="button" id="nq-catalog-add-btn" style="white-space:nowrap;">+ Add</button>
           </div>
         </div>
 
         <!-- Line items -->
-        <h3 style="font-size:14px;font-weight:800;margin:18px 0 10px;">Line Items</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <h3 style="font-size:14px;font-weight:800;margin:0;">Line Items</h3>
+          <div style="display:flex;gap:8px;">
+            <button class="button secondary" style="font-size:12px;padding:6px 12px;" id="nq-add-item">+ Custom Item</button>
+            <button class="button secondary" style="font-size:12px;padding:6px 12px;" id="nq-add-section">+ Section Header</button>
+          </div>
+        </div>
+
+        <!-- Column labels -->
+        <div style="display:flex;gap:6px;padding:4px 0;margin-bottom:2px;">
+          <div style="width:70px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Qty</div>
+          <div style="flex:1;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</div>
+          <div style="width:130px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Unit Price</div>
+          <div style="width:130px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Amount</div>
+          <div style="width:36px;"></div>
+        </div>
+
         <div id="nq-items-container">
           ${this.renderNewQuoteItemRow(0)}
         </div>
-        <div style="display:flex;gap:10px;margin-top:10px;">
-          <button class="button secondary" id="nq-add-item">+ Add Item</button>
-          <button class="button secondary" id="nq-add-section">+ Add Section Header</button>
-        </div>
 
         <!-- Totals preview -->
-        <div style="margin-top:20px;text-align:right;">
+        <div style="margin-top:16px;text-align:right;border-top:2px solid #e5e7eb;padding-top:12px;">
           <div style="font-size:13px;margin-bottom:4px;">Subtotal: <strong id="nq-subtotal">KES 0.00</strong></div>
           <div style="font-size:13px;margin-bottom:4px;">VAT (<span id="nq-vat-pct">16</span>%): <strong id="nq-vat-amt">KES 0.00</strong></div>
           <div style="font-size:16px;font-weight:900;color:var(--navy);">Total: <span id="nq-total">KES 0.00</span></div>
         </div>
 
-        <div style="display:flex;gap:12px;margin-top:24px;justify-content:flex-end;">
-          <button class="button secondary" id="nq-preview-btn">👁 Preview Quote</button>
+        <div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end;">
+          <button class="button secondary" id="nq-preview-btn">👁 Preview</button>
           <button class="button green" id="nq-save-btn">💾 Save Quote</button>
         </div>
       </div>
     </div>`;
   },
 
-  renderNewQuoteItemRow(idx, type = 'item') {
+  renderNewQuoteItemRow(idx, type = 'item', prefill = {}) {
     if (type === 'section') {
-      return `<div class="nq-row" data-type="section" data-idx="${idx}" style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
-        <input type="text" class="nq-section-name input-field" placeholder="Section name (e.g. CHURCH SETUP)" style="flex:1;margin:0;background:#8B1A1A;color:#fff;font-weight:700;">
-        <select class="nq-section-type input-field" style="width:160px;margin:0;">
-          <option value="section">Section (Red)</option>
-          <option value="subsection">Subsection (Dark)</option>
-        </select>
+      // Section header: white bg + bold dark-maroon text (matches PDF exactly)
+      return `<div class="nq-row" data-type="section" data-idx="${idx}"
+          style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
+        <input type="text" class="nq-section-name input-field"
+          placeholder="Section header name (e.g. CHURCH SETUP)"
+          style="flex:1;margin:0;font-weight:700;color:#5a1010;border:2px solid #8B1A2E;">
         <button class="nq-remove-row button red" style="padding:6px 10px;" title="Remove">✕</button>
       </div>`;
     }
-    return `<div class="nq-row" data-type="item" data-idx="${idx}" style="display:flex;gap:6px;margin-bottom:5px;align-items:center;">
-      <input type="number" class="nq-qty input-field" placeholder="Qty" style="width:70px;margin:0;" min="0">
-      <input type="text" class="nq-name input-field" placeholder="Description" style="flex:1;margin:0;">
-      <input type="number" class="nq-unit-price input-field" placeholder="Unit Price" style="width:130px;margin:0;" min="0" step="0.01">
-      <input type="text" class="nq-price-display input-field" placeholder="Amount" style="width:130px;margin:0;background:#f9f9f9;" readonly>
+    const qty = prefill.qty || '';
+    const name = prefill.name || '';
+    const price = prefill.price || '';
+    return `<div class="nq-row" data-type="item" data-idx="${idx}"
+        style="display:flex;gap:6px;margin-bottom:5px;align-items:center;">
+      <input type="number" class="nq-qty input-field" placeholder="Qty"
+        style="width:70px;margin:0;" min="0" value="${qty}">
+      <input type="text" class="nq-name input-field" placeholder="Description"
+        style="flex:1;margin:0;" value="${name}">
+      <input type="number" class="nq-unit-price input-field" placeholder="Unit Price"
+        style="width:130px;margin:0;" min="0" step="0.01" value="${price}">
+      <input type="text" class="nq-price-display input-field" placeholder="Amount"
+        style="width:130px;margin:0;background:#f9f9f9;" readonly>
       <button class="nq-remove-row button red" style="padding:6px 10px;" title="Remove">✕</button>
     </div>`;
   },
@@ -901,13 +952,39 @@ const app = {
     </div>`;
   },
 
+  // ── Modal helper ────────────────────────────────────────────────────────────
+  showModal(title, bodyHtml, onConfirm, confirmLabel = 'Save') {
+    const existing = document.getElementById('app-modal');
+    if (existing) existing.remove();
+    const m = document.createElement('div');
+    m.id = 'app-modal';
+    m.className = 'modal';
+    m.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">${title}</h3>
+          <button class="modal-close" id="modal-close-btn">✕</button>
+        </div>
+        <div id="modal-body">${bodyHtml}</div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+          <button class="button secondary" id="modal-cancel-btn">Cancel</button>
+          <button class="button green" id="modal-confirm-btn">${confirmLabel}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+    const close = () => m.remove();
+    document.getElementById('modal-close-btn').onclick = close;
+    document.getElementById('modal-cancel-btn').onclick = close;
+    document.getElementById('modal-confirm-btn').onclick = () => onConfirm(m, close);
+    m.addEventListener('click', (e) => { if (e.target === m) close(); });
+  },
+
   bindEvents() {
-    // Auth
+    // ── Auth ──────────────────────────────────────────────────────────────────
     document.querySelectorAll('.auth-mode-btn').forEach(b => b.addEventListener('click', (e) => {
       this.state.authMode = e.target.dataset.mode; this.render();
     }));
-    const authSub = document.getElementById('auth-submit');
-    if (authSub) authSub.addEventListener('click', async () => {
+    document.getElementById('auth-submit')?.addEventListener('click', async () => {
       const email = document.getElementById('auth-email')?.value;
       const password = document.getElementById('auth-password')?.value;
       if (this.state.authMode === 'login') {
@@ -920,12 +997,12 @@ const app = {
       }
     });
 
-    // Nav
-    document.querySelectorAll('.nav-item').forEach(b => b.addEventListener('click', (e) => this.setView(e.currentTarget.dataset.view)));
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) logoutBtn.addEventListener('click', () => this.handleLogout());
+    // ── Nav ───────────────────────────────────────────────────────────────────
+    document.querySelectorAll('.nav-item').forEach(b =>
+      b.addEventListener('click', (e) => this.setView(e.currentTarget.dataset.view)));
+    document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
 
-    // Quote previews from list/dashboard
+    // ── Quote preview buttons ─────────────────────────────────────────────────
     document.querySelectorAll('[data-preview-quote]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.previewQuote;
@@ -934,42 +1011,42 @@ const app = {
       });
     });
 
-    // New Quote interactions
-    const nqContainer = document.getElementById('nq-items-container');
-    if (nqContainer) {
-      // Delegate: remove row
-      document.addEventListener('click', (e) => {
+    // ── New Quote ─────────────────────────────────────────────────────────────
+    if (document.getElementById('nq-items-container')) {
+      // Single persistent delegated listener on the container for row events
+      const nqContainer = document.getElementById('nq-items-container');
+      nqContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('nq-remove-row')) {
           e.target.closest('.nq-row')?.remove();
           this.calcNewQuoteTotals();
         }
-      }, { once: true });
-
-      // Section type change → update background
-      document.addEventListener('change', (e) => {
-        if (e.target.classList.contains('nq-section-type')) {
-          const input = e.target.closest('.nq-row')?.querySelector('.nq-section-name');
-          if (input) {
-            input.style.background = e.target.value === 'subsection' ? '#2c2c2c' : '#8B1A1A';
-          }
-        }
-        if (e.target.classList.contains('nq-qty') || e.target.classList.contains('nq-unit-price') || e.target.id === 'nq-vat') {
+      });
+      nqContainer.addEventListener('input', (e) => {
+        if (e.target.classList.contains('nq-qty') || e.target.classList.contains('nq-unit-price')) {
           this.calcNewQuoteTotals();
         }
-      }, { once: true });
+      });
+      nqContainer.addEventListener('change', (e) => {
+        if (e.target.classList.contains('nq-section-type')) {
+          const input = e.target.closest('.nq-row')?.querySelector('.nq-section-name');
+          if (input) input.style.background = e.target.value === 'subsection' ? '#2c2c2c' : '#8B1A1A';
+        }
+      });
 
-      // Add item
+      document.getElementById('nq-vat')?.addEventListener('input', () => this.calcNewQuoteTotals());
+
       let rowIdx = 1;
       document.getElementById('nq-add-item')?.addEventListener('click', () => {
-        nqContainer.insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++));
-        this.bindNewQuoteRowEvents();
+        document.getElementById('nq-items-container').insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++));
       });
       document.getElementById('nq-add-section')?.addEventListener('click', () => {
-        nqContainer.insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++, 'section'));
-        this.bindNewQuoteRowEvents();
+        document.getElementById('nq-items-container').insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++, 'section'));
       });
-
-      // Preview
+      document.getElementById('nq-client')?.addEventListener('change', (e) => {
+        const opt = e.target.selectedOptions[0];
+        const cp = document.getElementById('nq-contact');
+        if (cp && opt) cp.value = opt.dataset.contact || '';
+      });
       document.getElementById('nq-preview-btn')?.addEventListener('click', () => {
         this.calcNewQuoteTotals();
         const data = this.collectNewQuoteData();
@@ -977,8 +1054,6 @@ const app = {
         preview.number = 'PREVIEW';
         showQuotePreview(preview, this.state.company);
       });
-
-      // Save
       document.getElementById('nq-save-btn')?.addEventListener('click', async () => {
         this.calcNewQuoteTotals();
         const data = this.collectNewQuoteData();
@@ -991,52 +1066,149 @@ const app = {
           this.render();
         } else { this.notify(result.error || 'Failed to save quote', 'error'); }
       });
-
-      // Initial calc
       this.calcNewQuoteTotals();
-      this.bindNewQuoteRowEvents();
     }
 
-    // Client select → fill contact person
-    document.getElementById('nq-client')?.addEventListener('change', (e) => {
-      const opt = e.target.selectedOptions[0];
-      const cp = document.getElementById('nq-contact');
-      if (cp && opt) cp.value = opt.dataset.contact || '';
+    // ── Catalog ───────────────────────────────────────────────────────────────
+    document.getElementById('cat-add-btn')?.addEventListener('click', () => {
+      this.showModal('Add Catalog Item', `
+        <div class="form-grid">
+          <div class="form-group full"><label>Name</label><input id="cat-name" class="input-field" placeholder="Item name" style="margin:0;"></div>
+          <div class="form-group"><label>Category</label><input id="cat-category" class="input-field" placeholder="e.g. Tents, Flowers" style="margin:0;"></div>
+          <div class="form-group"><label>Unit</label><input id="cat-unit" class="input-field" placeholder="e.g. pcs, day, hr" style="margin:0;"></div>
+          <div class="form-group full"><label>Description</label><textarea id="cat-desc" class="input-field" rows="2" placeholder="Optional description" style="margin:0;"></textarea></div>
+        </div>`, async (modal, close) => {
+        const name = document.getElementById('cat-name')?.value?.trim();
+        if (!name) { this.notify('Name is required', 'error'); return; }
+        const result = await API.catalog.create({
+          name,
+          category: document.getElementById('cat-category')?.value,
+          unit: document.getElementById('cat-unit')?.value,
+          description: document.getElementById('cat-desc')?.value,
+        });
+        if (result.id || result.success) {
+          this.notify('Item added!');
+          close();
+          await this.loadAppData();
+          this.state.view = 'catalog';
+          this.render();
+        } else { this.notify(result.error || 'Failed to add item', 'error'); }
+      });
     });
 
-    // Settings save
+    document.querySelectorAll('[data-del-catalog]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.currentTarget.dataset.delCatalog;
+        if (!confirm('Delete this catalog item?')) return;
+        await API.catalog.delete(id);
+        this.notify('Item deleted');
+        await this.loadAppData();
+        this.state.view = 'catalog';
+        this.render();
+      });
+    });
+
+    // ── Clients ───────────────────────────────────────────────────────────────
+    document.getElementById('cli-add-btn')?.addEventListener('click', () => {
+      this.showModal('Add Client', `
+        <div class="form-grid">
+          <div class="form-group full"><label>Client / Company Name</label><input id="cli-name" class="input-field" placeholder="e.g. Joan Langat" style="margin:0;"></div>
+          <div class="form-group"><label>Email</label><input id="cli-email" class="input-field" type="email" placeholder="client@email.com" style="margin:0;"></div>
+          <div class="form-group"><label>Phone</label><input id="cli-phone" class="input-field" placeholder="e.g. 0700 000 000" style="margin:0;"></div>
+          <div class="form-group"><label>Contact Person</label><input id="cli-contact" class="input-field" placeholder="Contact person name" style="margin:0;"></div>
+          <div class="form-group"><label>Address</label><input id="cli-address" class="input-field" placeholder="Address" style="margin:0;"></div>
+        </div>`, async (modal, close) => {
+        const name = document.getElementById('cli-name')?.value?.trim();
+        if (!name) { this.notify('Client name is required', 'error'); return; }
+        const result = await API.clients.create({
+          name,
+          email: document.getElementById('cli-email')?.value,
+          phone: document.getElementById('cli-phone')?.value,
+          contact_person: document.getElementById('cli-contact')?.value,
+          address: document.getElementById('cli-address')?.value,
+        });
+        if (result.id || result.success) {
+          this.notify('Client added!');
+          close();
+          await this.loadAppData();
+          this.state.view = 'clients';
+          this.render();
+        } else { this.notify(result.error || 'Failed to add client', 'error'); }
+      });
+    });
+
+    document.querySelectorAll('[data-del-client]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.currentTarget.dataset.delClient;
+        if (!confirm('Delete this client?')) return;
+        await API.clients.delete(id);
+        this.notify('Client deleted');
+        await this.loadAppData();
+        this.state.view = 'clients';
+        this.render();
+      });
+    });
+
+    // ── Users (admin only) ────────────────────────────────────────────────────
+    document.getElementById('usr-add-btn')?.addEventListener('click', () => {
+      this.showModal('Add User', `
+        <div class="form-grid">
+          <div class="form-group full"><label>Full Name</label><input id="usr-name" class="input-field" placeholder="Full name" style="margin:0;"></div>
+          <div class="form-group"><label>Email</label><input id="usr-email" class="input-field" type="email" placeholder="user@email.com" style="margin:0;"></div>
+          <div class="form-group"><label>Password</label><input id="usr-pass" class="input-field" type="password" placeholder="Min. 6 characters" style="margin:0;"></div>
+          <div class="form-group"><label>Role</label>
+            <select id="usr-role" class="input-field" style="margin:0;">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex-direction:row;align-items:center;gap:8px;">
+            <input type="checkbox" id="usr-verified" style="width:16px;height:16px;">
+            <label style="text-transform:none;letter-spacing:0;font-size:13px;margin:0;">Mark as verified</label>
+          </div>
+        </div>`, async (modal, close) => {
+        const name = document.getElementById('usr-name')?.value?.trim();
+        const email = document.getElementById('usr-email')?.value?.trim();
+        const password = document.getElementById('usr-pass')?.value;
+        if (!name || !email || !password) { this.notify('All fields required', 'error'); return; }
+        if (password.length < 6) { this.notify('Password must be at least 6 characters', 'error'); return; }
+        const result = await API.users.create({
+          name, email, password,
+          role: document.getElementById('usr-role')?.value || 'user',
+          verified: document.getElementById('usr-verified')?.checked ? 1 : 0,
+        });
+        if (result.id || result.success) {
+          this.notify('User created!');
+          close();
+          const users = await API.users.getAll();
+          this.state.users = users || [];
+          this.state.view = 'users';
+          this.render();
+        } else { this.notify(result.error || 'Failed to create user', 'error'); }
+      });
+    });
+
+    // ── Settings ──────────────────────────────────────────────────────────────
     document.getElementById('set-save-btn')?.addEventListener('click', async () => {
       const company = {
-        name: document.getElementById('set-name')?.value,
-        phone: document.getElementById('set-phone')?.value,
-        email: document.getElementById('set-email')?.value,
-        address: document.getElementById('set-address')?.value,
+        name:     document.getElementById('set-name')?.value,
+        phone:    document.getElementById('set-phone')?.value,
+        email:    document.getElementById('set-email')?.value,
+        address:  document.getElementById('set-address')?.value,
         currency: document.getElementById('set-currency')?.value,
-        terms: document.getElementById('set-terms')?.value,
-        logo: document.getElementById('set-logo')?.value,
+        terms:    document.getElementById('set-terms')?.value,
+        logo:     document.getElementById('set-logo')?.value,
       };
       const result = await API.company.save(company);
-      if (result.success) { this.state.company = { ...this.state.company, ...company }; this.notify('Settings saved!'); }
-      else { this.notify(result.error || 'Failed to save', 'error'); }
+      if (result.success) {
+        this.state.company = { ...this.state.company, ...company };
+        this.notify('Settings saved!');
+      } else { this.notify(result.error || 'Failed to save', 'error'); }
     });
   },
 
-  bindNewQuoteRowEvents() {
-    // Re-bind remove & calc on newly added rows
-    document.querySelectorAll('.nq-remove-row').forEach(btn => {
-      btn.onclick = () => { btn.closest('.nq-row')?.remove(); this.calcNewQuoteTotals(); };
-    });
-    document.querySelectorAll('.nq-qty, .nq-unit-price').forEach(inp => {
-      inp.oninput = () => this.calcNewQuoteTotals();
-    });
-    document.querySelectorAll('.nq-section-type').forEach(sel => {
-      sel.onchange = (e) => {
-        const input = sel.closest('.nq-row')?.querySelector('.nq-section-name');
-        if (input) input.style.background = e.target.value === 'subsection' ? '#2c2c2c' : '#8B1A1A';
-      };
-    });
-    document.getElementById('nq-vat')?.addEventListener('input', () => this.calcNewQuoteTotals());
-  }
+  // kept for compatibility but no longer needed for delegation
+  bindNewQuoteRowEvents() {}
 };
 
 // Boot
