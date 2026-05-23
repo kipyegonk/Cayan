@@ -102,38 +102,39 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 .qp-contact-info strong { font-weight: 700; }
 /* --- Title block --- */
 .qp-title-block { margin: 10px 0 8px; }
-.qp-title-block h1 { font-size: 18pt; font-weight: 900; letter-spacing: 0.04em; text-align: center; margin-bottom: 10px; }
+.qp-title-block h1 { font-size: 20pt; font-weight: 900; letter-spacing: 0.06em; text-align: center; margin-bottom: 8px; }
 .qp-meta { font-size: 8pt; line-height: 1.8; }
 .qp-meta strong { font-weight: 700; }
 /* --- Items table --- */
-/* Exact colours pixel-sampled from PDF:
-   - Column header bg:   #E8A598  salmon/coral, black text
-   - Section rows:       #E8A598  same salmon, black bold text
-   - Subsection rows:    #D9D9D9  light grey, black bold text
-   - Subtotal rows:      white bg, bold black
-   - Grand total row:    #E8A598  salmon, black bold
-   - Terms header pill:  #C0392B  dark red, white italic text
-   - Terms bullet:       ❑  (U+2751 hollow square dingbat)
+/* Exact colours matched from PDF:
+   - Table column header:  #C0392B  dark red, WHITE bold text  ← the Qty/Description/Unit Price/Price row
+   - Section rows:         #E8A090  salmon/coral, BLACK bold   ← CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS
+   - Subsection rows:      #D9D9D9  light grey,   BLACK bold   ← TENT AND DÉCOR, FLOWERS TOTAL etc.
+   - Subtotal rows:        white bg, bold
+   - Grand total row:      #E8A090  salmon, BLACK bold
+   - Terms header:         #C0392B  dark red pill, WHITE italic text
+   - Terms bullet:         ▪  small filled square (U+25AA)
 */
 .qp-table {
   width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8pt;
 }
+/* Column header — dark red bg, WHITE text (matches PDF Qty/Description/Unit Price/Price row) */
 .qp-table th {
-  background: #E8A598; color: #000; padding: 5px 7px;
+  background: #C0392B; color: #fff; padding: 5px 7px;
   text-align: left; font-weight: 700; font-size: 8pt;
-  border: 1px solid #bbb;
+  border: 1px solid #a93226;
 }
 .qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align: right; }
 .qp-table td {
   padding: 3px 7px; border: 1px solid #ccc; vertical-align: top;
 }
 .qp-table td:last-child, .qp-table td:nth-last-child(2) { text-align: right; white-space: nowrap; }
-/* Section header row — salmon, black bold (CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS) */
+/* Section header row — salmon/coral bg, black bold (CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS) */
 .qp-section-row td {
-  background: #E8A598; color: #000; font-weight: 700;
-  padding: 4px 7px; font-size: 8pt; border: 1px solid #bbb;
+  background: #E8A090; color: #000; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #d4887a;
 }
-/* Subsection header row — light grey, black bold (TENT AND DÉCOR, subtotals labels) */
+/* Subsection header row — light grey, black bold (TENT AND DÉCOR etc.) */
 .qp-subsection-row td {
   background: #D9D9D9; color: #000; font-weight: 700;
   padding: 4px 7px; font-size: 8pt; border: 1px solid #bbb;
@@ -152,19 +153,22 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 }
 .qp-totals-table td { padding: 4px 8px; border: 1px solid #ccc; }
 .qp-totals-table .total-label { font-weight: 700; }
-.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #E8A598; color: #000; }
+/* Grand total row — salmon bg, black bold (matches PDF TOTAL VAT INC row) */
+.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #E8A090; color: #000; }
 /* --- Terms box --- */
+/* Dark red pill header, white italic text — matches PDF "Terms and Conditions" label */
 .qp-terms-header {
   display: inline-block; background: #C0392B; color: #fff; font-style: italic;
   padding: 4px 14px; font-size: 9pt; margin-top: 18px; border-radius: 3px;
 }
 .qp-terms-list { margin-top: 10px; padding-left: 0; list-style: none; }
 .qp-terms-list li {
-  display: flex; gap: 8px; margin-bottom: 4px;
+  display: flex; gap: 6px; margin-bottom: 4px;
   font-size: 8pt; line-height: 1.5; color: #111; align-items: flex-start;
 }
+/* Small filled square — matches the checkbox-like bullet in the PDF */
 .qp-terms-list li::before {
-  content: "❑"; font-size: 10pt; flex-shrink: 0; line-height: 1.2; color: #111;
+  content: "▪"; font-size: 12pt; flex-shrink: 0; line-height: 1.1; color: #111;
 }
 /* --- Signature --- */
 .qp-signature { margin-top: 32px; font-size: 9pt; }
@@ -1035,7 +1039,42 @@ const app = {
 
       document.getElementById('nq-vat')?.addEventListener('input', () => this.calcNewQuoteTotals());
 
+      // ── Catalog search filter ──────────────────────────────────────────────
+      document.getElementById('nq-catalog-search')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const sel = document.getElementById('nq-catalog-select');
+        if (!sel) return;
+        Array.from(sel.options).forEach(opt => {
+          if (opt.value === '') return;
+          opt.hidden = !!(q && !opt.text.toLowerCase().includes(q));
+        });
+        const visible = Array.from(sel.options).filter(o => o.value && !o.hidden);
+        if (visible.length === 1) sel.value = visible[0].value;
+      });
+
+      // ── Add from catalog ───────────────────────────────────────────────────
       let rowIdx = 1;
+      document.getElementById('nq-catalog-add-btn')?.addEventListener('click', () => {
+        const sel = document.getElementById('nq-catalog-select');
+        const qtyInput = document.getElementById('nq-catalog-qty');
+        if (!sel || !sel.value) { app.notify('Pick a catalog item first', 'error'); return; }
+        const opt = sel.selectedOptions[0];
+        const qty = parseFloat(qtyInput?.value || 1);
+        const unitPrice = parseFloat(opt.dataset.price || 0);
+        const container = document.getElementById('nq-items-container');
+        container.insertAdjacentHTML('beforeend', app.renderNewQuoteItemRow(rowIdx++, 'item', {
+          name: opt.dataset.name || opt.text,
+          qty,
+          price: unitPrice,
+        }));
+        app.calcNewQuoteTotals();
+        sel.value = '';
+        if (qtyInput) qtyInput.value = 1;
+        const searchEl = document.getElementById('nq-catalog-search');
+        if (searchEl) { searchEl.value = ''; }
+        Array.from(sel.options).forEach(o => o.hidden = false);
+      });
+
       document.getElementById('nq-add-item')?.addEventListener('click', () => {
         document.getElementById('nq-items-container').insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++));
       });
