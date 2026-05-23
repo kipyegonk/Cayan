@@ -106,38 +106,38 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 .qp-meta { font-size: 8pt; line-height: 1.8; }
 .qp-meta strong { font-weight: 700; }
 /* --- Items table --- */
-/* Exact colours matched from PDF:
-   - Table column header:  #C0392B  dark red, WHITE bold text  ← the Qty/Description/Unit Price/Price row
-   - Section rows:         #E8A090  salmon/coral, BLACK bold   ← CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS
-   - Subsection rows:      #D9D9D9  light grey,   BLACK bold   ← TENT AND DÉCOR, FLOWERS TOTAL etc.
-   - Subtotal rows:        white bg, bold
-   - Grand total row:      #E8A090  salmon, BLACK bold
-   - Terms header:         #C0392B  dark red pill, WHITE italic text
-   - Terms bullet:         ▪  small filled square (U+25AA)
+/* Exact colours from PDF:
+   - Column header row:  #E8A090 salmon bg, #fff WHITE text  (Qty/Description/Unit Price/Price)
+   - Section rows:       #E8A090 salmon bg, #fff WHITE text  (CHURCH SETUP / RECEPTION / FLOWERS / LOGISTICS)
+   - Subsection rows:    #3D3D3D dark charcoal bg, #fff WHITE text  (TENT AND DÉCOR etc.)
+   - Subtotal rows:      white bg, bold black
+   - Grand total row:    #E8A090 salmon bg, #fff WHITE text  (TOTAL VAT INC.)
+   - Terms header pill:  #C0392B dark red, #fff WHITE italic
+   - Terms bullet:       ▪ small filled square
 */
 .qp-table {
   width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8pt;
 }
-/* Column header — dark red bg, WHITE text (matches PDF Qty/Description/Unit Price/Price row) */
+/* Column header — salmon bg, WHITE text */
 .qp-table th {
-  background: #C0392B; color: #fff; padding: 5px 7px;
+  background: #E8A090; color: #fff; padding: 5px 7px;
   text-align: left; font-weight: 700; font-size: 8pt;
-  border: 1px solid #a93226;
+  border: 1px solid #d4887a;
 }
 .qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align: right; }
 .qp-table td {
   padding: 3px 7px; border: 1px solid #ccc; vertical-align: top;
 }
 .qp-table td:last-child, .qp-table td:nth-last-child(2) { text-align: right; white-space: nowrap; }
-/* Section header row — salmon/coral bg, black bold (CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS) */
+/* Section header row — salmon bg, WHITE text (CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS) */
 .qp-section-row td {
-  background: #E8A090; color: #000; font-weight: 700;
+  background: #E8A090; color: #fff; font-weight: 700;
   padding: 4px 7px; font-size: 8pt; border: 1px solid #d4887a;
 }
-/* Subsection header row — light grey, black bold (TENT AND DÉCOR etc.) */
+/* Subsection header row — dark charcoal bg, WHITE text (TENT AND DÉCOR etc.) */
 .qp-subsection-row td {
-  background: #D9D9D9; color: #000; font-weight: 700;
-  padding: 4px 7px; font-size: 8pt; border: 1px solid #bbb;
+  background: #3D3D3D; color: #fff; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #2a2a2a;
 }
 /* Subtotal row */
 .qp-subtotal-row td {
@@ -153,8 +153,8 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 }
 .qp-totals-table td { padding: 4px 8px; border: 1px solid #ccc; }
 .qp-totals-table .total-label { font-weight: 700; }
-/* Grand total row — salmon bg, black bold (matches PDF TOTAL VAT INC row) */
-.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #E8A090; color: #000; }
+/* Grand total row — salmon bg, WHITE text */
+.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #E8A090; color: #fff; }
 /* --- Terms box --- */
 /* Dark red pill header, white italic text — matches PDF "Terms and Conditions" label */
 .qp-terms-header {
@@ -343,10 +343,10 @@ function renderQuotePreviewHTML(quote, company) {
   let rowIdx = 0;
   for (const g of groups) {
     if (g.type === 'section') {
-      rowHtml += `<tr class="qp-section-row"><td colspan="4">${g.label}</td></tr>`;
+      rowHtml += `<tr class="qp-section-row"><td></td><td colspan="3" style="text-align:left;">${g.label}</td></tr>`;
       rowIdx = 0;
     } else if (g.type === 'subsection') {
-      rowHtml += `<tr class="qp-subsection-row"><td colspan="4">${g.label}</td></tr>`;
+      rowHtml += `<tr class="qp-subsection-row"><td></td><td colspan="3" style="text-align:left;">${g.label}</td></tr>`;
       rowIdx = 0;
     } else if (g.type === 'subtotal') {
       rowHtml += `<tr class="qp-subtotal-row">
