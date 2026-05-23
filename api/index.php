@@ -1,9 +1,9 @@
 <?php
 //  API ROUTER & HANDLERS
 
-require_once 'config.php';
-require_once 'classes/Database.php';
-require_once 'classes/Auth.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../classes/Auth.php';
 
 $db = new Database();
 $auth = new Auth($db);
