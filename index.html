@@ -106,38 +106,38 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 .qp-meta { font-size: 8pt; line-height: 1.8; }
 .qp-meta strong { font-weight: 700; }
 /* --- Items table --- */
-/* Exact colours from PDF:
-   - Column header row:  #E8A090 salmon bg, #fff WHITE text  (Qty/Description/Unit Price/Price)
-   - Section rows:       #E8A090 salmon bg, #fff WHITE text  (CHURCH SETUP / RECEPTION / FLOWERS / LOGISTICS)
-   - Subsection rows:    #3D3D3D dark charcoal bg, #fff WHITE text  (TENT AND DÉCOR etc.)
+/* EXACT colours pixel-sampled from PDF:
+   - Column header row:  #760014  dark maroon bg, #fff WHITE text  (Qty/Description/Unit Price/Price)
+   - Section rows:       #D0A95E  golden/amber bg, #000 BLACK text (CHURCH SETUP / RECEPTION / FLOWERS / LOGISTICS)
+   - Subsection rows:    #D0A95E  same golden bg,  #000 BLACK text (TENT AND DÉCOR etc.)
    - Subtotal rows:      white bg, bold black
-   - Grand total row:    #E8A090 salmon bg, #fff WHITE text  (TOTAL VAT INC.)
-   - Terms header pill:  #C0392B dark red, #fff WHITE italic
-   - Terms bullet:       ▪ small filled square
+   - Grand total row:    #D0A95E  golden bg, #000 BLACK text       (TOTAL VAT INC.)
+   - Terms header pill:  #8B1A1A  dark red pill, #fff WHITE italic
+   - Terms bullet:       □  hollow square U+25A1
 */
 .qp-table {
   width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8pt;
 }
-/* Column header — salmon bg, WHITE text */
+/* Column header — dark maroon bg, WHITE text */
 .qp-table th {
-  background: #E8A090; color: #fff; padding: 5px 7px;
+  background: #760014; color: #fff; padding: 5px 7px;
   text-align: left; font-weight: 700; font-size: 8pt;
-  border: 1px solid #d4887a;
+  border: 1px solid #5a000f;
 }
 .qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align: right; }
 .qp-table td {
   padding: 3px 7px; border: 1px solid #ccc; vertical-align: top;
 }
 .qp-table td:last-child, .qp-table td:nth-last-child(2) { text-align: right; white-space: nowrap; }
-/* Section header row — salmon bg, WHITE text (CHURCH SETUP, RECEPTION, FLOWERS, LOGISTICS) */
+/* Section header row — golden/amber bg, BLACK text */
 .qp-section-row td {
-  background: #E8A090; color: #fff; font-weight: 700;
-  padding: 4px 7px; font-size: 8pt; border: 1px solid #d4887a;
+  background: #D0A95E; color: #000; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #b8923f;
 }
-/* Subsection header row — dark charcoal bg, WHITE text (TENT AND DÉCOR etc.) */
+/* Subsection header row — same golden/amber bg, BLACK text */
 .qp-subsection-row td {
-  background: #3D3D3D; color: #fff; font-weight: 700;
-  padding: 4px 7px; font-size: 8pt; border: 1px solid #2a2a2a;
+  background: #D0A95E; color: #000; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #b8923f;
 }
 /* Subtotal row */
 .qp-subtotal-row td {
@@ -153,22 +153,23 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 }
 .qp-totals-table td { padding: 4px 8px; border: 1px solid #ccc; }
 .qp-totals-table .total-label { font-weight: 700; }
-/* Grand total row — salmon bg, WHITE text */
-.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #E8A090; color: #fff; }
+/* Grand total row — golden bg, BLACK text */
+.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #D0A95E; color: #000; }
 /* --- Terms box --- */
-/* Dark red pill header, white italic text — matches PDF "Terms and Conditions" label */
+/* Dark red pill header, white italic text */
 .qp-terms-header {
-  display: inline-block; background: #C0392B; color: #fff; font-style: italic;
+  display: inline-block; background: #8B1A1A; color: #fff; font-style: italic;
   padding: 4px 14px; font-size: 9pt; margin-top: 18px; border-radius: 3px;
 }
-.qp-terms-list { margin-top: 10px; padding-left: 0; list-style: none; }
+.qp-terms-list { margin-top: 8px; padding-left: 0; list-style: none; }
 .qp-terms-list li {
-  display: flex; gap: 6px; margin-bottom: 4px;
+  display: flex; gap: 10px; margin-bottom: 5px;
   font-size: 8pt; line-height: 1.5; color: #111; align-items: flex-start;
 }
-/* Small filled square — matches the checkbox-like bullet in the PDF */
+/* Hollow square — matches the □ bullet in the PDF exactly */
 .qp-terms-list li::before {
-  content: "▪"; font-size: 12pt; flex-shrink: 0; line-height: 1.1; color: #111;
+  content: "\25A1"; font-size: 11pt; flex-shrink: 0; line-height: 1.15;
+  color: #111; font-family: Arial, sans-serif;
 }
 /* --- Signature --- */
 .qp-signature { margin-top: 32px; font-size: 9pt; }
@@ -384,9 +385,20 @@ function renderQuotePreviewHTML(quote, company) {
       <div class="qp-logo-text">${companyName}</div>
     </div>
     <div class="qp-contact-info">
-      <div><strong>Phone:</strong> ${phone}</div>
-      <div><strong>E-mail:</strong> <span style="text-decoration:underline;color:#1a0dab;">${email}</span></div>
-      <div><strong>Address:</strong> ${address}</div>
+      <table style="border:none;border-collapse:collapse;font-size:8pt;line-height:1.9;">
+        <tr>
+          <td style="font-weight:700;padding:0 4px 0 0;white-space:nowrap;">Phone:</td>
+          <td style="padding:0;">${phone}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;padding:0 4px 0 0;white-space:nowrap;">E-mail:</td>
+          <td style="padding:0;text-decoration:underline;color:#1a0dab;">${email}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;padding:0 4px 0 0;white-space:nowrap;">Address</td>
+          <td style="padding:0;">${address}</td>
+        </tr>
+      </table>
     </div>
   </div>
 
@@ -949,7 +961,16 @@ const app = {
           <div class="form-group full"><label>Address</label><input type="text" id="set-address" class="input-field" value="${c.address||''}" placeholder="Mokoyeti West Road, Karen"></div>
           <div class="form-group"><label>Currency</label><input type="text" id="set-currency" class="input-field" value="${c.currency||'KES'}" placeholder="KES"></div>
           <div class="form-group full"><label>Terms &amp; Conditions</label><textarea id="set-terms" class="input-field" rows="5" placeholder="Your standard terms...">${c.terms||''}</textarea></div>
-          <div class="form-group full"><label>Company Logo (base64 or URL)</label><input type="text" id="set-logo" class="input-field" value="${c.logo||''}" placeholder="Paste base64 logo data..."></div>
+          <div class="form-group full">
+            <label>Company Logo (JPEG / PNG)</label>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <input type="file" id="set-logo-file" accept="image/jpeg,image/png,image/gif,image/webp"
+                style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;background:#fff;cursor:pointer;">
+              ${c.logo ? \`<img src="\${c.logo}" alt="Current logo"
+                style="height:60px;width:auto;border:1px solid var(--border);border-radius:6px;padding:4px;object-fit:contain;">\` : '<span style="color:var(--gray);font-size:12px;">No logo uploaded yet</span>'}
+            </div>
+            <p style="font-size:11px;color:var(--gray);margin:4px 0 0;">Upload a JPEG or PNG. Recommended: transparent background, square crop.</p>
+          </div>
         </div>
         <button class="button green" id="set-save-btn">💾 Save Settings</button>
       </div>
@@ -1229,20 +1250,35 @@ const app = {
 
     // ── Settings ──────────────────────────────────────────────────────────────
     document.getElementById('set-save-btn')?.addEventListener('click', async () => {
-      const company = {
-        name:     document.getElementById('set-name')?.value,
-        phone:    document.getElementById('set-phone')?.value,
-        email:    document.getElementById('set-email')?.value,
-        address:  document.getElementById('set-address')?.value,
-        currency: document.getElementById('set-currency')?.value,
-        terms:    document.getElementById('set-terms')?.value,
-        logo:     document.getElementById('set-logo')?.value,
+      const fileInput = document.getElementById('set-logo-file');
+      const file = fileInput?.files?.[0];
+
+      const saveCompany = async (logoData) => {
+        const company = {
+          name:     document.getElementById('set-name')?.value,
+          phone:    document.getElementById('set-phone')?.value,
+          email:    document.getElementById('set-email')?.value,
+          address:  document.getElementById('set-address')?.value,
+          currency: document.getElementById('set-currency')?.value,
+          terms:    document.getElementById('set-terms')?.value,
+          logo:     logoData !== undefined ? logoData : (this.state.company.logo || ''),
+        };
+        const result = await API.company.save(company);
+        if (result.success) {
+          this.state.company = { ...this.state.company, ...company };
+          this.notify('Settings saved!');
+          this.render();
+        } else { this.notify(result.error || 'Failed to save', 'error'); }
       };
-      const result = await API.company.save(company);
-      if (result.success) {
-        this.state.company = { ...this.state.company, ...company };
-        this.notify('Settings saved!');
-      } else { this.notify(result.error || 'Failed to save', 'error'); }
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => saveCompany(e.target.result);
+        reader.onerror = () => { this.notify('Failed to read logo file', 'error'); };
+        reader.readAsDataURL(file);
+      } else {
+        saveCompany(undefined);
+      }
     });
   },
 
