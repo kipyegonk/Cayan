@@ -1,2015 +1,1056 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuoteSystem - Quote Management</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --navy: #1B2F4E;
-            --navy-light: #243d62;
-            --blue: #2563EB;
-            --blue-hover: #1D4ED8;
-            --green: #059669;
-            --red: #DC2626;
-            --amber: #D97706;
-            --gray: #6B7280;
-            --border: #E5E7EB;
-            --bg: #F0F4F8;
-            --white: #FFFFFF;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: #111;
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 220px;
-            background: var(--navy);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
-        .sidebar-header {
-            padding: 22px 20px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            color: #fff;
-        }
-
-        .sidebar-header .logo {
-            font-size: 22px;
-            margin-bottom: 6px;
-        }
-
-        .sidebar-header .company-name {
-            font-weight: 700;
-            font-size: 14px;
-            line-height: 1.3;
-            margin-bottom: 4px;
-        }
-
-        .sidebar-header .user-name {
-            color: rgba(255, 255, 255, 0.45);
-            font-size: 11px;
-            margin-top: 6px;
-        }
-
-        .sidebar-header .role-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 20px;
-            margin-top: 4px;
-            letter-spacing: 0.06em;
-        }
-
-        .sidebar nav {
-            flex: 1;
-            padding: 10px 0;
-            overflow-y: auto;
-        }
-
-        .nav-item {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            border: none;
-            border-left: 3px solid transparent;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 13px;
-            font-weight: 400;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.15s;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .nav-item.active {
-            border-left-color: #60A5FA;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .sidebar-footer {
-            padding: 14px 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .logout-btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: transparent;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 7px;
-            transition: all 0.15s;
-        }
-
-        .main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 28px;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            padding: 12px 22px;
-            border-radius: 9px;
-            color: #fff;
-            font-weight: 600;
-            font-size: 13px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .toast.success {
-            background: var(--green);
-        }
-
-        .toast.error {
-            background: var(--red);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
-            padding: 24px;
-            margin-bottom: 14px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            font-size: 13px;
-            outline: none;
-            font-family: inherit;
-            background: #fff;
-            color: #111;
-            margin-bottom: 12px;
-        }
-
-        .button {
-            padding: 9px 18px;
-            background: var(--blue);
-            color: #fff;
-            border: none;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s;
-        }
-
-        .button:hover {
-            background: var(--blue-hover);
-        }
-
-        .button.navy {
-            background: var(--navy);
-        }
-
-        .button.green {
-            background: var(--green);
-        }
-
-        .button.red {
-            background: var(--red);
-        }
-
-        .button.secondary {
-            background: #F3F4F6;
-            color: #374151;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .loader {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: var(--bg);
-            font-family: system-ui, sans-serif;
-        }
-
-        .loader-content {
-            text-align: center;
-            color: var(--navy);
-        }
-
-        .loader-icon {
-            font-size: 40px;
-            margin-bottom: 14px;
-        }
-
-        .loader-text {
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .auth-screen {
-            min-height: 100vh;
-            display: flex;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        .auth-left {
-            flex: 1;
-            background: linear-gradient(145deg, var(--navy) 0%, #1e4080 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            color: #fff;
-        }
-
-        .auth-right {
-            width: 440px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 48px 44px;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 24px;
-        }
-
-        .page-title {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 800;
-            color: #111;
-        }
-
-        .page-subtitle {
-            color: var(--gray);
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 18px 20px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
-            border-top: 3px solid var(--blue);
-        }
-
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 800;
-            color: #111;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        table thead tr {
-            background: #F8FAFC;
-        }
-
-        table th {
-            padding: 10px 12px;
-            text-align: left;
-            font-weight: 700;
-            color: #374151;
-            font-size: 11px;
-            border-bottom: 2px solid var(--border);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        table td {
-            padding: 11px 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        table tbody tr:nth-child(even) {
-            background: #FAFAFA;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: #fff;
-            border-radius: 14px;
-            padding: 32px;
-            width: 100%;
-            max-width: 620px;
-            max-height: 92vh;
-            overflow: auto;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 22px;
-        }
-
-        .modal-title {
-            margin: 0;
-            font-size: 17px;
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--gray);
-            padding: 4px;
-            line-height: 1;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-20 {
-            margin-top: 20px;
-        }
-
-        .mb-20 {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: #374151;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        .quote-layout {
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        .quote-section {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .quote-card {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.08);
-            padding: 20px;
-        }
-
-        .quote-preview {
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
-            min-height: 680px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            background: #fff;
-        }
-
-        .quote-preview .quote-header {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            align-items: flex-start;
-        }
-
-        .quote-branding {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .quote-logo {
-            width: 68px;
-            height: 68px;
-            display: grid;
-            place-items: center;
-            background: #f8fafc;
-            border-radius: 50%;
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        .quote-contact {
-            text-align: right;
-            font-size: 12px;
-            color: #4B5563;
-            line-height: 1.5;
-        }
-
-        .quote-top-details {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            padding: 18px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .quote-top-details div {
-            font-size: 12px;
-            color: #374151;
-            line-height: 1.6;
-        }
-
-        .quote-top-details strong {
-            display: block;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 6px;
-        }
-
-        .quote-preview table.quote-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            font-size: 12px;
-        }
-
-        .quote-preview table.quote-table th,
-        .quote-preview table.quote-table td {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-        }
-
-        .quote-preview table.quote-table th {
-            background: #7C2D12;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.08em;
-        }
-
-        .quote-preview table.quote-table td {
-            color: #374151;
-            vertical-align: top;
-        }
-
-        .quote-table-section-row td {
-            background: #7C2D12;
-            color: #fff;
-            font-weight: 700;
-            padding: 10px 12px;
-        }
-
-        .quote-preview .quote-summary {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 14px;
-            align-items: start;
-        }
-
-        .quote-preview .quote-summary .quote-total {
-            display: grid;
-            gap: 8px;
-            min-width: 240px;
-        }
-
-        .quote-preview .quote-summary .quote-total div {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #374151;
-        }
-
-        .quote-preview .quote-summary .quote-total div strong {
-            color: #111;
-        }
-
-        .quote-terms-title {
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #111;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-
-        .quote-preview .quote-footer {
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-            font-size: 12px;
-            color: #4B5563;
-            line-height: 1.7;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .quote-preview .quote-footer div {
-            margin-bottom: 8px;
-        }
-
-        .quote-preview .quote-signature {
-            font-size: 14px;
-            font-weight: 700;
-            color: #111827;
-            margin-top: 10px;
-        }
-
-        .quote-preview .quote-signature-date {
-            margin-top: 4px;
-            font-size: 12px;
-            color: #4B5563;
-        }
-
-        .quote-preview .quote-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: auto;
-        }
-
-        .quote-preview .quote-actions .button {
-            padding: 10px 18px;
-        }
-
-        .quote-preview .quote-header {
-            display: grid;
-            grid-template-columns: 1fr 1.4fr;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .quote-preview .quote-contact {
-            text-align: left;
-        }
-
-        .quote-title {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            margin: 0 auto;
-            color: #111827;
-        }
-
-        .quote-top-details {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            padding: 16px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .quote-top-details div {
-            font-size: 12px;
-            color: #374151;
-            line-height: 1.7;
-        }
-
-        .quote-top-details strong {
-            display: block;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 6px;
-        }
-
-        .quote-preview table.quote-table th,
-        .quote-preview table.quote-table td {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-        }
-
-        .quote-preview table.quote-table th {
-            background: #7C2D12;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.08em;
-            text-align: left;
-        }
-
-        .quote-preview table.quote-table td {
-            color: #374151;
-            vertical-align: top;
-        }
-
-        .quote-table-section-row td {
-            background: #7C2D12;
-            color: #fff;
-            font-weight: 700;
-            padding: 10px 12px;
-        }
-
-        .quote-table-category-total-row td {
-            border-top: 2px solid #7C2D12;
-            background: #FDF2F2;
-            font-weight: 700;
-            color: #111827;
-        }
-
-        .quote-table-category-total-row td:first-child {
-            border: none;
-        }
-
-        .quote-table-category-total-row td:nth-child(3),
-        .quote-table-category-total-row td:nth-child(4) {
-            text-align: right;
-        }
-
-        .quote-preview .quote-summary {
-            display: grid;
-            grid-template-columns: 1fr minmax(240px, 340px);
-            gap: 18px;
-            align-items: start;
-        }
-
-        .quote-preview .quote-summary .quote-total {
-            display: grid;
-            gap: 10px;
-            padding: 18px;
-            border: 1px solid #7C2D12;
-            background: #FEF3F2;
-        }
-
-        .quote-preview .quote-summary .quote-total div {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #374151;
-        }
-
-        .quote-preview .quote-summary .quote-total div strong {
-            color: #111827;
-        }
-
-        .quote-preview .quote-summary .quote-total-final {
-            margin-top: 8px;
-            font-size: 15px;
-            letter-spacing: 0.02em;
-        }
-
-        .quote-terms-list {
-            padding-left: 18px;
-            margin: 0;
-            color: #4B5563;
-            font-size: 12px;
-            line-height: 1.7;
-            list-style: square inside;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #quote-preview, #quote-preview * {
-                visibility: visible;
-            }
-            #quote-preview {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-            }
-            .quote-preview .quote-actions {
-                display: none !important;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .quote-layout {
-                grid-template-columns: 1fr;
-            }
-            .quote-preview {
-                min-height: auto;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                max-height: 60px;
-            }
-
-            .main {
-                padding: 16px;
-            }
-
-            .auth-right {
-                width: 100%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuoteSystem - Professional Quote Management</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --navy: #1B2F4E; --navy-light: #243d62; --blue: #2563EB; --blue-hover: #1D4ED8;
+  --green: #059669; --red: #DC2626; --amber: #D97706; --gray: #6B7280;
+  --border: #E5E7EB; --bg: #F0F4F8; --white: #FFFFFF;
+  --quote-header: #8B1A1A; /* dark maroon for section headers */
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #111; }
+.container { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 220px; background: var(--navy); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); color: #fff; }
+.sidebar-header .logo { font-size: 22px; margin-bottom: 6px; }
+.sidebar-header .company-name { font-weight: 700; font-size: 14px; line-height: 1.3; margin-bottom: 4px; }
+.sidebar-header .user-name { color: rgba(255,255,255,0.45); font-size: 11px; margin-top: 6px; }
+.sidebar-header .role-badge { display: inline-block; background: rgba(255,255,255,0.12); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; margin-top: 4px; letter-spacing: 0.06em; }
+.sidebar nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+.nav-item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 20px; border: none; border-left: 3px solid transparent; background: transparent; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 400; cursor: pointer; text-align: left; transition: all 0.15s; }
+.nav-item:hover { background: rgba(255,255,255,0.08); }
+.nav-item.active { border-left-color: #60A5FA; background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; }
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.08); }
+.logout-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: rgba(255,255,255,0.6); font-size: 12px; cursor: pointer; border-radius: 7px; transition: all 0.15s; }
+.main { flex: 1; overflow-y: auto; padding: 28px; }
+.toast { position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 12px 22px; border-radius: 9px; color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); animation: slideIn 0.3s ease-out; }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.card { background: var(--white); border-radius: 12px; box-shadow: 0 1px 5px rgba(0,0,0,0.07); padding: 24px; margin-bottom: 14px; }
+.input-field { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; outline: none; font-family: inherit; background: #fff; color: #111; margin-bottom: 12px; }
+.button { padding: 9px 18px; background: var(--blue); color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.button:hover { background: var(--blue-hover); }
+.button.navy { background: var(--navy); }
+.button.green { background: var(--green); }
+.button.red { background: var(--red); }
+.button.secondary { background: #F3F4F6; color: #374151; }
+.hidden { display: none !important; }
+.loader { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--bg); font-family: system-ui, sans-serif; }
+.loader-content { text-align: center; color: var(--navy); }
+.loader-icon { font-size: 40px; margin-bottom: 14px; }
+.loader-text { font-weight: 700; font-size: 18px; }
+.auth-screen { min-height: 100vh; display: flex; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.auth-left { flex: 1; background: linear-gradient(145deg, var(--navy) 0%, #1e4080 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; color: #fff; }
+.auth-right { width: 440px; background: #fff; display: flex; flex-direction: column; justify-content: center; padding: 48px 44px; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.page-title { margin: 0; font-size: 22px; font-weight: 800; color: #111; }
+.page-subtitle { color: var(--gray); font-size: 13px; margin-top: 4px; }
+.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 5px rgba(0,0,0,0.07); border-top: 3px solid var(--blue); }
+.stat-icon { font-size: 24px; margin-bottom: 8px; }
+.stat-label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.stat-value { font-size: 20px; font-weight: 800; color: #111; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table thead tr { background: #F8FAFC; }
+table th { padding: 10px 12px; text-align: left; font-weight: 700; color: #374151; font-size: 11px; border-bottom: 2px solid var(--border); text-transform: uppercase; letter-spacing: 0.04em; }
+table td { padding: 11px 12px; border-bottom: 1px solid var(--border); }
+table tbody tr:nth-child(even) { background: #FAFAFA; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-content { background: #fff; border-radius: 14px; padding: 32px; width: 100%; max-width: 620px; max-height: 92vh; overflow: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.modal-title { margin: 0; font-size: 17px; font-weight: 800; color: var(--navy); }
+.modal-close { background: none; border: none; cursor: pointer; font-size: 20px; color: var(--gray); padding: 4px; line-height: 1; }
+label { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group.full { grid-column: 1 / -1; }
+
+/* ============================================================
+   QUOTE PREVIEW - matches the PDF exactly
+   ============================================================ */
+.quote-preview-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: flex-start; justify-content: center;
+  z-index: 2000; padding: 20px; overflow-y: auto;
+}
+.quote-preview-wrapper {
+  background: #fff; width: 794px; min-height: 1000px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9pt;
+  color: #111;
+  padding: 28px 32px 40px;
+  position: relative;
+}
+/* --- Header row --- */
+.qp-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 14px;
+}
+.qp-logo-area { display: flex; flex-direction: column; gap: 2px; }
+.qp-logo-img { width: 80px; height: 80px; object-fit: contain; }
+.qp-logo-text {
+  font-size: 14pt; font-weight: 700; color: #c0392b;
+  font-style: italic; margin-top: 4px;
+}
+.qp-contact-info { text-align: right; font-size: 8pt; line-height: 1.7; }
+.qp-contact-info strong { font-weight: 700; }
+/* --- Title block --- */
+.qp-title-block { margin: 10px 0 8px; }
+.qp-title-block h1 { font-size: 18pt; font-weight: 900; letter-spacing: 0.04em; text-align: center; margin-bottom: 10px; }
+.qp-meta { font-size: 8pt; line-height: 1.8; }
+.qp-meta strong { font-weight: 700; }
+/* --- Items table --- */
+.qp-table {
+  width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8pt;
+}
+.qp-table th {
+  background: #c0392b; color: #fff; padding: 5px 7px;
+  text-align: left; font-weight: 700; font-size: 8pt;
+  border: 1px solid #a93226;
+}
+.qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align: right; }
+.qp-table td {
+  padding: 3px 7px; border: 1px solid #ddd; vertical-align: top;
+}
+.qp-table td:last-child, .qp-table td:nth-last-child(2) { text-align: right; white-space: nowrap; }
+/* Section header row */
+.qp-section-row td {
+  background: #c0392b; color: #fff; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #a93226;
+}
+/* Subsection header row (e.g. TENT AND DÉCOR, FLOWERS) */
+.qp-subsection-row td {
+  background: #2c2c2c; color: #fff; font-weight: 700;
+  padding: 4px 7px; font-size: 8pt; border: 1px solid #222;
+}
+/* Subtotal row */
+.qp-subtotal-row td {
+  font-weight: 700; background: #f2f2f2;
+  border-top: 2px solid #bbb; padding: 4px 7px;
+}
+/* Alternating rows */
+.qp-table tbody tr.even td { background: #fafafa; }
+/* Grand total block */
+.qp-totals-table {
+  width: 280px; margin-left: auto; margin-top: 8px; border-collapse: collapse; font-size: 9pt;
+}
+.qp-totals-table td { padding: 4px 8px; }
+.qp-totals-table .total-label { font-weight: 700; }
+.qp-totals-table .total-grand { font-weight: 900; font-size: 10pt; background: #c0392b; color: #fff; }
+/* --- Terms box --- */
+.qp-terms-header {
+  background: #c0392b; color: #fff; font-weight: 700;
+  padding: 5px 10px; font-size: 8.5pt; margin-top: 16px;
+}
+.qp-terms-list { margin-top: 6px; padding-left: 0; list-style: none; }
+.qp-terms-list li {
+  display: flex; gap: 8px; margin-bottom: 5px;
+  font-size: 7.5pt; line-height: 1.5; color: #222;
+}
+.qp-terms-list li::before {
+  content: "■"; font-size: 8pt; flex-shrink: 0; margin-top: 1px;
+}
+/* --- Signature --- */
+.qp-signature { margin-top: 32px; font-size: 9pt; }
+.qp-signature p { margin-bottom: 4px; }
+.qp-sig-row { display: flex; gap: 80px; margin-top: 6px; align-items: flex-start; }
+/* --- Print controls --- */
+.qp-controls {
+  position: sticky; top: 0; background: #1B2F4E;
+  display: flex; gap: 10px; padding: 10px 16px; z-index: 10;
+  justify-content: flex-end; border-radius: 0 0 8px 8px;
+  margin: -28px -32px 16px;
+}
+@media print {
+  .qp-controls, .sidebar, .main > *:not(.quote-preview-overlay) { display: none !important; }
+  .quote-preview-overlay { position: static; padding: 0; background: none; }
+  .quote-preview-wrapper { box-shadow: none; width: 100%; }
+  .qp-controls { display: none; }
+}
+
+/* Cayan logo SVG fallback */
+.cayan-logo-svg { width: 80px; height: 70px; }
+</style>
 </head>
 <body>
-    <div id="app"></div>
-
-    <script type="module">
-        import { renderDashboard } from './sections/dashboard.js';
-        import { renderNewQuote } from './sections/newQuote.js';
-        import { renderQuotesList } from './sections/quotes.js';
-        import { renderCatalog } from './sections/catalog.js';
-        import { renderClients } from './sections/clients.js';
-        import { renderUsers } from './sections/users.js';
-        import { renderSettings } from './sections/settings.js';
-
-        // API BASE URL
-        const API_BASE = './api';
-
-        // Utility Functions
-        const API = {
-            async request(endpoint, method = 'GET', body = null) {
-                const options = {
-                    method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                };
-
-                const token = localStorage.getItem('auth_token');
-                if (token) {
-                    options.headers.Authorization = `Bearer ${token}`;
-                }
-
-                if (body) {
-                    options.body = JSON.stringify(body);
-                }
-
-                try {
-                    const response = await fetch(`${API_BASE}/${endpoint}`, options);
-                    if (!response.ok && response.status === 401) {
-                        localStorage.removeItem('auth_token');
-                        localStorage.removeItem('user');
-                        window.location.reload();
-                    }
-                    return await response.json();
-                } catch (error) {
-                    console.error('API Error:', error);
-                    return { error: 'Network error' };
-                }
-            },
-
-            auth: {
-                login: (email, password) => API.request('auth/login', 'POST', { email, password }),
-                register: (name, email, password) => API.request('auth/register', 'POST', { name, email, password }),
-                verify: () => API.request('auth/verify'),
-            },
-
-            users: {
-                getAll: () => API.request('users'),
-                create: (user) => API.request('users', 'POST', user),
-                update: (id, user) => API.request(`users/${id}`, 'PUT', user),
-                delete: (id) => API.request(`users/${id}`, 'DELETE'),
-            },
-
-            company: {
-                get: () => API.request('company'),
-                save: (company) => API.request('company', 'POST', company),
-            },
-
-            catalog: {
-                getAll: () => API.request('catalog'),
-                get: (id) => API.request(`catalog/${id}`),
-                create: (item) => API.request('catalog', 'POST', item),
-                update: (id, item) => API.request(`catalog/${id}`, 'PUT', item),
-                delete: (id) => API.request(`catalog/${id}`, 'DELETE'),
-            },
-
-            clients: {
-                getAll: () => API.request('clients'),
-                get: (id) => API.request(`clients/${id}`),
-                create: (client) => API.request('clients', 'POST', client),
-                update: (id, client) => API.request(`clients/${id}`, 'PUT', client),
-                delete: (id) => API.request(`clients/${id}`, 'DELETE'),
-            },
-
-            quotes: {
-                getAll: () => API.request('quotes'),
-                get: (id) => API.request(`quotes/${id}`),
-                create: (quote) => API.request('quotes', 'POST', quote),
-                update: (id, quote) => API.request(`quotes/${id}`, 'PUT', quote),
-                delete: (id) => API.request(`quotes/${id}`, 'DELETE'),
-            },
-
-            stats: {
-                get: () => API.request('stats'),
-            }
-        };
-
-        // Helper Functions
-        const helpers = {
-            generateId: () => {
-                return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-            },
-
-            formatDate: (dateStr) => {
-                if (!dateStr) return '';
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            },
-
-            formatMoney: (amount, currency = 'KES') => {
-                return `${currency} ${Number(amount || 0).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            },
-
-            addDays: (date, days) => {
-                const result = new Date(date);
-                result.setDate(result.getDate() + days);
-                return result.toISOString().slice(0, 10);
-            },
-
-            today: () => new Date().toISOString().slice(0, 10),
-        };
-
-        // State Management
-        const app = {
-            state: {
-                page: 'auth',
-                authMode: 'login',
-                user: JSON.parse(localStorage.getItem('user')) || null,
-                view: 'dashboard',
-                loading: true,
-                toast: null,
-                company: {},
-                catalog: [],
-                clients: [],
-                quotes: [],
-                users: [],
-                previewQuote: null,
-                catalogModal: null,
-                clientModal: null,
-                dropdowns: null,
-            },
-
-            notify: (msg, type = 'success') => {
-                app.state.toast = { msg, type };
-                app.render();
-                setTimeout(() => {
-                    app.state.toast = null;
-                    app.render();
-                }, 3200);
-            },
-
-            setPage: (page) => {
-                app.state.page = page;
-                app.render();
-            },
-
-            setView: (view) => {
-                app.state.view = view;
-                app.render();
-            },
-
-            async handleLogin(email, password) {
-                const result = await API.auth.login(email, password);
-                if (result.success) {
-                    localStorage.setItem('auth_token', result.token);
-                    localStorage.setItem('user', JSON.stringify(result.user));
-                    app.state.user = result.user;
-                    app.state.page = 'app';
-                    app.loadAppData();
-                    app.render();
-                } else {
-                    app.notify(result.error, 'error');
-                }
-            },
-
-            async handleRegister(name, email, password) {
-                const result = await API.auth.register(name, email, password);
-                if (result.success) {
-                    app.notify(result.message, 'success');
-                    app.state.authMode = 'login';
-                    app.render();
-                } else {
-                    app.notify(result.error, 'error');
-                }
-            },
-
-            handleLogout: () => {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user');
-                app.state.user = null;
-                app.state.page = 'auth';
-                app.state.view = 'dashboard';
-                app.render();
-            },
-
-            async handleCatalogAdd() {
-                if (app.state.user?.role !== 'admin') {
-                    app.notify('Only admins can add catalog items', 'error');
-                    return;
-                }
-                app.state.catalogModal = {
-                    edit: false,
-                    item: {
-                        name: '',
-                        category: 'General',
-                        description: '',
-                        cost_price: '0',
-                        margin: '20',
-                        unit: 'unit'
-                    }
-                };
-                app.render();
-            },
-
-            async handleCatalogEdit(itemId) {
-                if (app.state.user?.role !== 'admin') {
-                    app.notify('Only admins can edit catalog items', 'error');
-                    return;
-                }
-
-                const item = app.state.catalog.find(i => i.id === itemId);
-                if (!item) {
-                    app.notify('Catalog item not found', 'error');
-                    return;
-                }
-
-                app.state.catalogModal = {
-                    edit: true,
-                    item: {
-                        id: item.id,
-                        name: item.name || '',
-                        category: item.category || 'General',
-                        description: item.description || '',
-                        cost_price: item.cost_price || '0',
-                        margin: item.margin || '20',
-                        unit: item.unit || 'unit'
-                    }
-                };
-                app.render();
-            },
-
-            async handleCatalogDelete(itemId) {
-                if (app.state.user?.role !== 'admin') {
-                    app.notify('Only admins can delete catalog items', 'error');
-                    return;
-                }
-
-                const confirmed = window.confirm('Delete this catalog item?');
-                if (!confirmed) return;
-
-                const result = await API.catalog.delete(itemId);
-                if (result.success) {
-                    app.notify('Catalog item deleted', 'success');
-                    app.loadAppData();
-                } else {
-                    app.notify(result.error || 'Failed to delete item', 'error');
-                }
-            },
-
-            handleClientsAdd() {
-                app.state.clientModal = {
-                    edit: false,
-                    client: {
-                        name: '',
-                        company: '',
-                        contact_person: '',
-                        email: '',
-                        phone: '',
-                        address: '',
-                        vat: ''
-                    }
-                };
-                app.render();
-            },
-
-            handleClientEdit(clientId) {
-                const client = app.state.clients.find(c => c.id === clientId);
-                if (!client) {
-                    app.notify('Client not found', 'error');
-                    return;
-                }
-                app.state.clientModal = {
-                    edit: true,
-                    client: {
-                        id: client.id,
-                        name: client.name || '',
-                        company: client.company || '',
-                        contact_person: client.contact_person || '',
-                        email: client.email || '',
-                        phone: client.phone || '',
-                        address: client.address || '',
-                        vat: client.vat || ''
-                    }
-                };
-                app.render();
-            },
-
-            async handleClientDelete(clientId) {
-                const confirmed = window.confirm('Delete this client?');
-                if (!confirmed) return;
-
-                const result = await API.clients.delete(clientId);
-                if (result.success) {
-                    app.notify('Client deleted', 'success');
-                    app.loadAppData();
-                } else {
-                    app.notify(result.error || 'Failed to delete client', 'error');
-                }
-            },
-
-            closeClientModal() {
-                app.state.clientModal = null;
-                app.render();
-            },
-
-            async saveClientModal() {
-                if (!app.state.clientModal) return;
-
-                const name = document.getElementById('client-name')?.value.trim();
-                const company = document.getElementById('client-company')?.value.trim();
-                const contact_person = document.getElementById('client-contact_person')?.value.trim();
-                const email = document.getElementById('client-email')?.value.trim();
-                const phone = document.getElementById('client-phone')?.value.trim();
-                const address = document.getElementById('client-address')?.value.trim();
-                const vat = document.getElementById('client-vat')?.value.trim();
-
-                if (!name) {
-                    app.notify('Client name is required', 'error');
-                    return;
-                }
-
-                const payload = { name, company, contact_person, email, phone, address, vat };
-                let result;
-                if (app.state.clientModal.edit) {
-                    result = await API.clients.update(app.state.clientModal.client.id, payload);
-                } else {
-                    result = await API.clients.create(payload);
-                }
-
-                if (result.success) {
-                    app.notify(app.state.clientModal.edit ? 'Client updated' : 'Client created', 'success');
-                    app.closeClientModal();
-                    app.loadAppData();
-                } else {
-                    app.notify(result.error || 'Failed to save client', 'error');
-                }
-            },
-
-            async loadAppData() {
-                app.loadDropdownSettings();
-
-                const [company, catalog, clients, quotes, stats] = await Promise.all([
-                    API.company.get(),
-                    API.catalog.getAll(),
-                    API.clients.getAll(),
-                    API.quotes.getAll(),
-                    API.stats.get(),
-                ]);
-
-                app.state.company = company || {};
-                app.state.catalog = catalog || [];
-                app.state.clients = clients || [];
-                app.state.quotes = quotes || [];
-                app.state.stats = stats || {};
-                app.state.loading = false;
-                app.state.catalogModal = null;
-                app.state.clientModal = null;
-                app.render();
-            },
-
-            loadDropdownSettings() {
-                const defaults = {
-                    categories: ['General', 'Church Setup', 'Tent & Décor', 'Flowers', 'Logistics', 'Maintenance', 'Development', 'Services', 'Installation'],
-                    margins: [10, 15, 20, 25, 30, 35, 40],
-                    units: ['unit', 'hr', 'lot', 'project', 'year']
-                };
-                const dropdowns = {};
-
-                Object.keys(defaults).forEach(key => {
-                    const stored = localStorage.getItem(`quote_system_dropdown_${key}`);
-                    if (stored) {
-                        try {
-                            const parsed = JSON.parse(stored);
-                            dropdowns[key] = Array.isArray(parsed) ? parsed : defaults[key];
-                        } catch {
-                            dropdowns[key] = defaults[key];
-                        }
-                    } else {
-                        dropdowns[key] = defaults[key];
-                    }
-                });
-
-                app.state.dropdowns = dropdowns;
-            },
-
-            saveDropdownSettings() {
-                if (!app.state.dropdowns) return;
-
-                Object.keys(app.state.dropdowns).forEach(key => {
-                    localStorage.setItem(`quote_system_dropdown_${key}`, JSON.stringify(app.state.dropdowns[key]));
-                });
-            },
-
-            initializeQuoteDraft() {
-                if (app.state.quoteDraft) return app.state.quoteDraft;
-
-                const today = helpers.today();
-                const validDays = 30;
-                const defaultUnit = app.state.dropdowns?.units?.[0] || 'unit';
-
-                app.state.quoteDraft = {
-                    id: helpers.generateId(),
-                    client_id: '',
-                    client_name: '',
-                    client_company: '',
-                    title: '',
-                    venue: '',
-                    guests: '',
-                    contact_person: '',
-                    quote_date: today,
-                    valid_days: validDays,
-                    valid_until: helpers.addDays(today, validDays),
-                    include_vat: true,
-                    vat_rate: 16,
-                    subtotal: '0.00',
-                    vat_amount: '0.00',
-                    total: '0.00',
-                    status: 'draft',
-                    notes: '',
-                    number: '',
-                    items: [
-                        {
-                            id: helpers.generateId(),
-                            name: '',
-                            description: '',
-                            category: app.state.dropdowns?.categories?.[0] || 'General',
-                            quantity: 1,
-                            unit: defaultUnit,
-                            unit_price: '0.00',
-                            margin: 20,
-                        }
-                    ]
-                };
-                return app.state.quoteDraft;
-            },
-
-            updateQuoteTotals(quote) {
-                if (!quote) quote = app.initializeQuoteDraft();
-
-                const subtotal = quote.items.reduce((sum, item) => {
-                    const quantity = Number(item.quantity) || 0;
-                    const unit_price = Number(item.unit_price) || 0;
-                    return sum + (quantity * unit_price);
-                }, 0);
-
-                const vatRate = Number(quote.vat_rate) || 0;
-                const vatAmount = quote.include_vat ? (subtotal * vatRate / 100) : 0;
-                const total = subtotal + vatAmount;
-
-                quote.subtotal = subtotal.toFixed(2);
-                quote.vat_amount = vatAmount.toFixed(2);
-                quote.total = total.toFixed(2);
-            },
-
-            handleQuoteClientSelect(e) {
-                const clientId = e.currentTarget.value;
-                const quote = app.initializeQuoteDraft();
-                quote.client_id = clientId;
-
-                const client = app.state.clients.find(c => c.id === clientId);
-                if (client) {
-                    quote.client_name = client.name || '';
-                    quote.client_company = client.company || '';
-                }
-                app.render();
-            },
-
-            handleQuoteInputChange(field, value) {
-                const quote = app.initializeQuoteDraft();
-
-                if (field === 'quote_date') {
-                    quote.quote_date = value;
-                    quote.valid_until = helpers.addDays(value, Number(quote.valid_days) || 0);
-                } else if (field === 'valid_days') {
-                    quote.valid_days = Number(value) || 0;
-                    quote.valid_until = helpers.addDays(quote.quote_date, Number(quote.valid_days));
-                } else if (field === 'include_vat') {
-                    quote.include_vat = value === 'true' || value === true || value === '1';
-                } else if (field === 'vat_rate') {
-                    quote.vat_rate = Number(value) || 0;
-                } else if (field === 'status') {
-                    quote.status = value;
-                } else if (field === 'notes') {
-                    quote.notes = value;
-                } else if (field === 'title') {
-                    quote.title = value;
-                } else if (field === 'venue') {
-                    quote.venue = value;
-                } else if (field === 'guests') {
-                    quote.guests = value;
-                } else if (field === 'contact_person') {
-                    quote.contact_person = value;
-                } else if (field === 'client_name') {
-                    quote.client_name = value;
-                    quote.client_id = '';
-                } else if (field === 'client_company') {
-                    quote.client_company = value;
-                }
-
-                app.updateQuoteTotals(quote);
-                app.render();
-            },
-
-            handleQuoteItemChange(itemId, field, value) {
-                const quote = app.initializeQuoteDraft();
-                const item = quote.items.find(i => i.id === itemId);
-                if (!item) return;
-
-                if (field === 'quantity' || field === 'margin') {
-                    item[field] = Number(value) || 0;
-                } else if (field === 'unit_price') {
-                    item[field] = value;
-                } else {
-                    item[field] = value;
-                }
-
-                app.updateQuoteTotals(quote);
-                app.render();
-            },
-
-            addQuoteItem() {
-                const quote = app.initializeQuoteDraft();
-                quote.items.push({
-                    id: helpers.generateId(),
-                    name: '',
-                    description: '',
-                    quantity: 1,
-                    unit: app.state.dropdowns?.units?.[0] || 'unit',
-                    unit_price: '0.00',
-                    margin: 20,
-                });
-                app.render();
-            },
-
-            removeQuoteItem(itemId) {
-                const quote = app.initializeQuoteDraft();
-                if (quote.items.length <= 1) return;
-                quote.items = quote.items.filter(item => item.id !== itemId);
-                app.updateQuoteTotals(quote);
-                app.render();
-            },
-
-            async handleSaveQuote() {
-                const quote = app.initializeQuoteDraft();
-                if (!quote.client_name.trim()) {
-                    app.notify('Please choose a client or enter a client name', 'error');
-                    return;
-                }
-                if (!quote.quote_date) {
-                    app.notify('Quote date is required', 'error');
-                    return;
-                }
-                if (!quote.items.length) {
-                    app.notify('Add at least one quote item', 'error');
-                    return;
-                }
-
-                const payload = {
-                    client_id: quote.client_id,
-                    client_name: quote.client_name,
-                    client_company: quote.client_company,
-                    title: quote.title || '',
-                    venue: quote.venue || '',
-                    guests: quote.guests || '',
-                    contact_person: quote.contact_person || '',
-                    quote_date: quote.quote_date,
-                    valid_days: Number(quote.valid_days) || 0,
-                    valid_until: quote.valid_until,
-                    subtotal: Number(quote.subtotal) || 0,
-                    vat_rate: Number(quote.vat_rate) || 0,
-                    vat_amount: Number(quote.vat_amount) || 0,
-                    total: Number(quote.total) || 0,
-                    include_vat: quote.include_vat,
-                    status: quote.status || 'draft',
-                    notes: quote.notes || '',
-                    items: quote.items.map(item => ({
-                        name: item.name,
-                        description: item.description,
-                        category: item.category || '',
-                        quantity: Number(item.quantity) || 0,
-                        unit: item.unit,
-                        unit_price: Number(item.unit_price) || 0,
-                        margin: Number(item.margin) || 0,
-                    }))
-                };
-
-                const result = await API.quotes.create(payload);
-                if (result.success) {
-                    quote.id = result.id;
-                    quote.number = result.number;
-                    app.notify(`Quote ${result.number} saved`, 'success');
-                    await app.loadAppData();
-                    app.state.quoteDraft = quote;
-                    app.render();
-                } else {
-                    app.notify(result.error || 'Failed to save quote', 'error');
-                }
-            },
-
-            handlePrintQuote() {
-                window.print();
-            },
-
-            handleDropdownAdd(type) {
-                const current = app.state.dropdowns?.[type] || [];
-                const label = type === 'margins' ? 'Margin percentage' : type === 'units' ? 'Unit name' : 'Category name';
-                const value = window.prompt(`Add new ${label}`);
-                if (!value) return;
-
-                const newValue = type === 'margins' ? parseInt(value, 10) : value.trim();
-                if (newValue === '' || Number.isNaN(newValue)) return;
-                if (current.includes(newValue)) {
-                    app.notify(`${label} already exists`, 'error');
-                    return;
-                }
-
-                app.state.dropdowns[type] = [...current, newValue];
-                app.saveDropdownSettings();
-                app.notify(`${label} added`, 'success');
-                app.render();
-            },
-
-            handleDropdownEdit(type, oldValue) {
-                const current = app.state.dropdowns?.[type] || [];
-                const label = type === 'margins' ? 'Margin percentage' : type === 'units' ? 'Unit name' : 'Category name';
-                const parsedOldValue = type === 'margins' ? parseInt(oldValue, 10) : oldValue;
-                const value = window.prompt(`Edit ${label}`, oldValue);
-                if (value === null) return;
-
-                const newValue = type === 'margins' ? parseInt(value, 10) : value.trim();
-                if (newValue === '' || Number.isNaN(newValue)) return;
-                if (newValue === parsedOldValue) return;
-
-                app.state.dropdowns[type] = current.map(item => item === parsedOldValue ? newValue : item);
-                app.saveDropdownSettings();
-                app.notify(`${label} updated`, 'success');
-                app.render();
-            },
-
-            handleDropdownDelete(type, oldValue) {
-                const current = app.state.dropdowns?.[type] || [];
-                const parsedOldValue = type === 'margins' ? parseInt(oldValue, 10) : oldValue;
-                if (!window.confirm('Remove this dropdown value?')) return;
-
-                app.state.dropdowns[type] = current.filter(item => item !== parsedOldValue);
-                app.saveDropdownSettings();
-                app.notify('Dropdown value deleted', 'success');
-                app.render();
-            },
-
-            closeCatalogModal() {
-                app.state.catalogModal = null;
-                app.render();
-            },
-
-            async saveCatalogModal() {
-                if (!app.state.catalogModal) return;
-
-                const name = document.getElementById('catalog-name')?.value.trim();
-                const category = document.getElementById('catalog-category')?.value.trim() || (app.state.dropdowns?.categories?.[0] || 'General');
-                const description = document.getElementById('catalog-description')?.value.trim() || '';
-                const cost_price = parseFloat(document.getElementById('catalog-cost_price')?.value) || 0;
-                const margin = parseInt(document.getElementById('catalog-margin')?.value, 10) || (app.state.dropdowns?.margins?.[0] || 0);
-                const unit = document.getElementById('catalog-unit')?.value.trim() || (app.state.dropdowns?.units?.[0] || 'unit');
-
-                if (!name) {
-                    app.notify('Name is required', 'error');
-                    return;
-                }
-
-                const payload = {
-                    name,
-                    category,
-                    description,
-                    cost_price,
-                    margin,
-                    unit
-                };
-
-                let result;
-                if (app.state.catalogModal.edit) {
-                    result = await API.catalog.update(app.state.catalogModal.item.id, payload);
-                } else {
-                    result = await API.catalog.create(payload);
-                }
-
-                if (result.success) {
-                    app.notify(app.state.catalogModal.edit ? 'Catalog item updated' : 'Catalog item added', 'success');
-                    app.closeCatalogModal();
-                    app.loadAppData();
-                } else {
-                    app.notify(result.error || 'Failed to save item', 'error');
-                }
-            },
-
-            renderCatalogModal: () => {
-                const modal = app.state.catalogModal;
-                if (!modal) return '';
-
-                const item = modal.item;
-                const categories = app.state.dropdowns?.categories || ['General', 'Church Setup', 'Tent & Décor', 'Flowers', 'Logistics', 'Maintenance', 'Development', 'Services', 'Installation'];
-                const margins = app.state.dropdowns?.margins || [10, 15, 20, 25, 30, 35, 40];
-                const units = app.state.dropdowns?.units || ['unit', 'hr', 'lot', 'project', 'year'];
-
-                return `
-                    <div class="modal catalog-modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3 class="modal-title">${modal.edit ? 'Edit Catalog Item' : 'Add Catalog Item'}</h3>
-                                <button class="modal-close catalog-modal-close">×</button>
-                            </div>
-                            <div class="form-grid" style="gap: 14px; margin-bottom: 16px;">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <input id="catalog-name" class="input-field" type="text" value="${item.name}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Category</label>
-                                    <select id="catalog-category" class="input-field">
-                                        ${categories.map(cat => `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Cost Price</label>
-                                    <input id="catalog-cost_price" class="input-field" type="number" step="0.01" value="${item.cost_price}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Margin</label>
-                                    <select id="catalog-margin" class="input-field">
-                                        ${margins.map(value => `<option value="${value}" ${value.toString() === item.margin.toString() ? 'selected' : ''}>${value}%</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Unit</label>
-                                    <select id="catalog-unit" class="input-field">
-                                        ${units.map(value => `<option value="${value}" ${value === item.unit ? 'selected' : ''}>${value}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="form-group full">
-                                    <label>Description</label>
-                                    <input id="catalog-description" class="input-field" type="text" value="${item.description}" />
-                                </div>
-                            </div>
-                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                                <button class="button secondary catalog-modal-close">Cancel</button>
-                                <button class="button green catalog-modal-save">${modal.edit ? 'Save changes' : 'Create item'}</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderClientModal: () => {
-                const modal = app.state.clientModal;
-                if (!modal) return '';
-
-                const client = modal.client;
-
-                return `
-                    <div class="modal client-modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3 class="modal-title">${modal.edit ? 'Edit Client' : 'Add Client'}</h3>
-                                <button class="modal-close client-modal-close">×</button>
-                            </div>
-                            <div class="form-grid" style="gap: 14px; margin-bottom: 16px;">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <input id="client-name" class="input-field" type="text" value="${client.name || ''}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Company</label>
-                                    <input id="client-company" class="input-field" type="text" value="${client.company || ''}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Contact Person</label>
-                                    <input id="client-contact_person" class="input-field" type="text" value="${client.contact_person || ''}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input id="client-email" class="input-field" type="email" value="${client.email || ''}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone</label>
-                                    <input id="client-phone" class="input-field" type="text" value="${client.phone || ''}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Address</label>
-                                    <input id="client-address" class="input-field" type="text" value="${client.address || ''}" />
-                                </div>
-                                <div class="form-group">
-                                    <label>VAT Number</label>
-                                    <input id="client-vat" class="input-field" type="text" value="${client.vat || ''}" />
-                                </div>
-                            </div>
-                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                                <button class="button secondary client-modal-close">Cancel</button>
-                                <button class="button green client-modal-save">${modal.edit ? 'Save changes' : 'Create client'}</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            render: () => {
-                const app_el = document.getElementById('app');
-
-                if (app.state.loading) {
-                    app_el.innerHTML = `
-                        <div class="loader">
-                            <div class="loader-content">
-                                <div class="loader-icon">📋</div>
-                                <div class="loader-text">Loading QuoteSystem...</div>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                if (app.state.page === 'auth') {
-                    app_el.innerHTML = app.renderAuthScreen();
-                } else {
-                    app_el.innerHTML = app.renderAppScreen();
-                }
-
-                if (app.state.toast) {
-                    const toastClass = app.state.toast.type === 'success' ? 'success' : 'error';
-                    const toastIcon = app.state.toast.type === 'success' ? '✓' : '⚠';
-                    const toast_el = document.createElement('div');
-                    toast_el.className = `toast ${toastClass}`;
-                    toast_el.innerHTML = `${toastIcon} ${app.state.toast.msg}`;
-                    app_el.appendChild(toast_el);
-                }
-
-                if (app.state.catalogModal) {
-                    app_el.innerHTML += app.renderCatalogModal();
-                }
-                if (app.state.clientModal) {
-                    app_el.innerHTML += app.renderClientModal();
-                }
-
-                app.attachEventListeners();
-            },
-
-            renderAuthScreen: () => {
-                const { authMode } = app.state;
-                return `
-                    <div class="auth-screen">
-                        <div class="auth-left">
-                            <div style="font-size: 56px; margin-bottom: 16px;">📋</div>
-                            <h1 style="color: #fff; font-size: 30px; font-weight: 800; margin: 0 0 10px; text-align: center;">Quote Management</h1>
-                            <p style="color: rgba(255,255,255,0.55); text-align: center; line-height: 1.7; max-width: 300px; font-size: 14px;">Professional quotations, client management, and item catalog — all in one place.</p>
-                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 32px;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <span style="font-size: 18px;">📄</span>
-                                    <span style="color: rgba(255,255,255,0.7); font-size: 13px;">Create & send professional quotes</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <span style="font-size: 18px;">📦</span>
-                                    <span style="color: rgba(255,255,255,0.7); font-size: 13px;">Manage your product/service catalog</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="auth-right">
-                            <h2 style="font-size: 22px; font-weight: 800; color: var(--navy); margin: 0 0 4px;">${authMode === 'login' ? 'Welcome back' : 'Create account'}</h2>
-                            <p style="color: var(--gray); font-size: 13px; margin: 0 0 28px;">${authMode === 'login' ? 'Sign in to your account to continue.' : 'Register for access — an admin will verify you.'}</p>
-                            
-                            <div style="display: flex; background: var(--bg); border-radius: 8px; padding: 4px; margin-bottom: 24px;">
-                                <button class="auth-mode-btn" data-mode="login" style="flex: 1; padding: 8px 0; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${authMode === 'login' ? '#fff' : 'transparent'}; color: ${authMode === 'login' ? 'var(--navy)' : 'var(--gray)'}; box-shadow: ${authMode === 'login' ? '0 1px 4px rgba(0,0,0,0.1)' : 'none'}; transition: all 0.2s;">Sign In</button>
-                                <button class="auth-mode-btn" data-mode="register" style="flex: 1; padding: 8px 0; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${authMode === 'register' ? '#fff' : 'transparent'}; color: ${authMode === 'register' ? 'var(--navy)' : 'var(--gray)'}; box-shadow: ${authMode === 'register' ? '0 1px 4px rgba(0,0,0,0.1)' : 'none'}; transition: all 0.2s;">Register</button>
-                            </div>
-
-                            <div style="display: flex; flex-direction: column; gap: 14px;">
-                                ${authMode === 'register' ? '<div class="form-group"><label>Full Name</label><input type="text" id="reg-name" class="input-field" placeholder="Your full name"></div>' : ''}
-                                <div class="form-group"><label>Email Address</label><input type="email" id="auth-email" class="input-field" placeholder="your@email.com"></div>
-                                <div class="form-group"><label>Password</label><input type="password" id="auth-password" class="input-field" placeholder="Min. 6 characters"></div>
-                            </div>
-
-                            <button id="auth-submit" class="button navy" style="width: 100%; justify-content: center; padding: 12px; margin-top: 20px; font-size: 14px;">
-                                ${authMode === 'login' ? 'Sign In →' : 'Submit Registration'}
-                            </button>
-                            ${authMode === 'login' ? '<p style="text-align: center; font-size: 11px; color: #9CA3AF; margin: 14px 0 0;">Default: admin@company.com / admin123</p>' : ''}
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderAppScreen: () => {
-                const navItems = [
-                    { id: 'dashboard', emoji: '⊞', label: 'Dashboard' },
-                    { id: 'newquote', emoji: '📝', label: 'New Quote' },
-                    { id: 'quotes', emoji: '📄', label: 'All Quotes' },
-                    { id: 'catalog', emoji: '📦', label: 'Catalog' },
-                    { id: 'clients', emoji: '👥', label: 'Clients' },
-                    ...(app.state.user?.role === 'admin' ? [{ id: 'users', emoji: '🔑', label: 'Users' }] : []),
-                    { id: 'settings', emoji: '⚙️', label: 'Settings' },
-                ];
-
-                return `
-                    <div class="container">
-                        <aside class="sidebar">
-                            <div class="sidebar-header">
-                                <div class="logo">📋</div>
-                                <div class="company-name">${app.state.company.name || 'QuoteSystem'}</div>
-                                <div class="user-name">${app.state.user?.name}</div>
-                                <div class="role-badge">${app.state.user?.role?.toUpperCase()}</div>
-                            </div>
-                            <nav>
-                                ${navItems.map(item => `
-                                    <button class="nav-item ${app.state.view === item.id ? 'active' : ''}" data-view="${item.id}">
-                                        <span>${item.emoji}</span>
-                                        ${item.label}
-                                    </button>
-                                `).join('')}
-                            </nav>
-                            <div class="sidebar-footer">
-                                <button id="logout-btn" class="logout-btn">🚪 Sign Out</button>
-                            </div>
-                        </aside>
-
-                        <main class="main">
-                            ${app.renderViewContent()}
-                        </main>
-                    </div>
-                `;
-            },
-
-            renderViewContent: () => {
-                const view = app.state.view;
-                
-                if (view === 'dashboard') {
-                    return app.renderDashboard();
-                } else if (view === 'newquote') {
-                    return app.renderNewQuote();
-                } else if (view === 'quotes') {
-                    return app.renderQuotesList();
-                } else if (view === 'catalog') {
-                    return app.renderCatalog();
-                } else if (view === 'clients') {
-                    return app.renderClients();
-                } else if (view === 'users') {
-                    return app.renderUsers();
-                } else if (view === 'settings') {
-                    return app.renderSettings();
-                }
-                return '';
-            },
-
-            renderDashboard: () => {
-                const stats = app.state.stats || {};
-                return `
-                    <div style="max-width: 1100px;">
-                        <div class="page-header">
-                            <div>
-                                <h2 class="page-title">Dashboard</h2>
-                                <p class="page-subtitle">Overview of your quotation activity</p>
-                            </div>
-                        </div>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon">📄</div>
-                                <div class="stat-label">Total Quotes</div>
-                                <div class="stat-value">${stats.total_quotes || 0}</div>
-                            </div>
-                            <div class="stat-card" style="border-top-color: var(--green);">
-                                <div class="stat-icon">💰</div>
-                                <div class="stat-label">Total Value</div>
-                                <div class="stat-value">${helpers.formatMoney(stats.total_value, app.state.company.currency)}</div>
-                            </div>
-                            <div class="stat-card" style="border-top-color: var(--amber);">
-                                <div class="stat-icon">⏳</div>
-                                <div class="stat-label">Pending</div>
-                                <div class="stat-value">${stats.pending || 0}</div>
-                            </div>
-                            <div class="stat-card" style="border-top-color: var(--green);">
-                                <div class="stat-icon">✅</div>
-                                <div class="stat-label">Accepted</div>
-                                <div class="stat-value">${stats.accepted || 0}</div>
-                            </div>
-                            <div class="stat-card" style="border-top-color: #7C3AED;">
-                                <div class="stat-icon">👥</div>
-                                <div class="stat-label">Clients</div>
-                                <div class="stat-value">${stats.clients || 0}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderNewQuote: () => renderNewQuote(app.state, helpers),
-            renderQuotesList: () => renderQuotesList(app.state, helpers),
-            renderCatalog: () => renderCatalog(app.state, helpers),
-            renderClients: () => renderClients(app.state, helpers),
-            renderUsers: () => renderUsers(app.state, helpers),
-            renderSettings: () => renderSettings(app.state, helpers),
-
-            attachEventListeners: () => {
-                // Auth mode switching
-                document.querySelectorAll('.auth-mode-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.state.authMode = e.target.dataset.mode;
-                        app.render();
-                    });
-                });
-
-                // Auth submit
-                const submitBtn = document.getElementById('auth-submit');
-                if (submitBtn) {
-                    submitBtn.addEventListener('click', async () => {
-                        const email = document.getElementById('auth-email')?.value;
-                        const password = document.getElementById('auth-password')?.value;
-
-                        if (app.state.authMode === 'login') {
-                            if (!email || !password) {
-                                app.notify('Please enter your email and password', 'error');
-                                return;
-                            }
-                            await app.handleLogin(email, password);
-                        } else {
-                            const name = document.getElementById('reg-name')?.value;
-                            if (!name || !email || !password) {
-                                app.notify('All fields are required', 'error');
-                                return;
-                            }
-                            if (password.length < 6) {
-                                app.notify('Password must be at least 6 characters', 'error');
-                                return;
-                            }
-                            await app.handleRegister(name, email, password);
-                        }
-                    });
-                }
-
-                // Navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        app.setView(e.currentTarget.dataset.view);
-                    });
-                });
-
-                // Catalog actions
-                const addBtn = document.querySelector('.catalog-add-btn');
-                if (addBtn) {
-                    addBtn.addEventListener('click', app.handleCatalogAdd);
-                }
-
-                document.querySelectorAll('.catalog-edit-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleCatalogEdit(e.currentTarget.dataset.id);
-                    });
-                });
-
-                document.querySelectorAll('.catalog-delete-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleCatalogDelete(e.currentTarget.dataset.id);
-                    });
-                });
-
-                const clientsAddBtn = document.querySelector('.clients-add-btn');
-                if (clientsAddBtn) {
-                    clientsAddBtn.addEventListener('click', app.handleClientsAdd);
-                }
-
-                document.querySelectorAll('.client-edit-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleClientEdit(e.currentTarget.dataset.id);
-                    });
-                });
-
-                document.querySelectorAll('.client-delete-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleClientDelete(e.currentTarget.dataset.id);
-                    });
-                });
-
-                document.querySelectorAll('.dropdown-add-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleDropdownAdd(e.currentTarget.dataset.type);
-                    });
-                });
-
-                document.querySelectorAll('.dropdown-edit-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleDropdownEdit(e.currentTarget.dataset.type, e.currentTarget.dataset.value);
-                    });
-                });
-
-                document.querySelectorAll('.dropdown-delete-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        app.handleDropdownDelete(e.currentTarget.dataset.type, e.currentTarget.dataset.value);
-                    });
-                });
-
-                const modalCloseButtons = document.querySelectorAll('.catalog-modal-close');
-                modalCloseButtons.forEach(btn => {
-                    btn.addEventListener('click', app.closeCatalogModal);
-                });
-
-                const modalSaveButton = document.querySelector('.catalog-modal-save');
-                if (modalSaveButton) {
-                    modalSaveButton.addEventListener('click', app.saveCatalogModal);
-                }
-
-                const clientModalCloseButtons = document.querySelectorAll('.client-modal-close');
-                clientModalCloseButtons.forEach(btn => {
-                    btn.addEventListener('click', app.closeClientModal);
-                });
-
-                const clientModalSaveButton = document.querySelector('.client-modal-save');
-                if (clientModalSaveButton) {
-                    clientModalSaveButton.addEventListener('click', app.saveClientModal);
-                }
-
-                const quoteClientSelect = document.getElementById('quote-client-select');
-                if (quoteClientSelect) {
-                    quoteClientSelect.addEventListener('change', app.handleQuoteClientSelect);
-                }
-
-                document.querySelectorAll('[data-quote-field]').forEach(element => {
-                    element.addEventListener('input', (e) => {
-                        const field = e.currentTarget.dataset.quoteField;
-                        app.handleQuoteInputChange(field, e.currentTarget.type === 'checkbox' ? e.currentTarget.checked : e.currentTarget.value);
-                    });
-                });
-
-                document.querySelectorAll('[data-quote-item-field]').forEach(element => {
-                    element.addEventListener('input', (e) => {
-                        const itemId = e.currentTarget.dataset.itemId;
-                        const field = e.currentTarget.dataset.quoteItemField;
-                        app.handleQuoteItemChange(itemId, field, e.currentTarget.value);
-                    });
-                });
-
-                document.querySelectorAll('.quote-item-remove-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const itemId = e.currentTarget.dataset.itemId;
-                        app.removeQuoteItem(itemId);
-                    });
-                });
-
-                const addQuoteItemBtn = document.getElementById('quote-add-item');
-                if (addQuoteItemBtn) {
-                    addQuoteItemBtn.addEventListener('click', app.addQuoteItem);
-                }
-
-                const saveQuoteBtn = document.getElementById('quote-save-btn');
-                if (saveQuoteBtn) {
-                    saveQuoteBtn.addEventListener('click', app.handleSaveQuote);
-                }
-
-                const printQuoteBtn = document.getElementById('quote-print-btn');
-                if (printQuoteBtn) {
-                    printQuoteBtn.addEventListener('click', app.handlePrintQuote);
-                }
-
-                // Logout
-                const logoutBtn = document.getElementById('logout-btn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', app.handleLogout);
-                }
-            }
-        };
-
-        // Initialize app
-        window.addEventListener('load', async () => {
-            const token = localStorage.getItem('auth_token');
-            if (token) {
-                const verified = await API.auth.verify();
-                if (verified.valid) {
-                    app.state.user = verified.user;
-                    app.state.page = 'app';
-                    app.loadAppData();
-                } else {
-                    app.state.loading = false;
-                    app.render();
-                }
-            } else {
-                app.state.loading = false;
-                app.render();
-            }
-        });
-    </script>
+<div id="app"></div>
+
+<script>
+const API_BASE = './api';
+
+const API = {
+  async request(endpoint, method = 'GET', body = null) {
+    const options = { method, headers: { 'Content-Type': 'application/json' } };
+    const token = localStorage.getItem('auth_token');
+    if (token) options.headers.Authorization = `Bearer ${token}`;
+    if (body) options.body = JSON.stringify(body);
+    try {
+      const response = await fetch(`${API_BASE}/${endpoint}`, options);
+      if (!response.ok && response.status === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        window.location.reload();
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      return { error: 'Network error' };
+    }
+  },
+  auth: {
+    login: (email, password) => API.request('auth/login', 'POST', { email, password }),
+    register: (name, email, password) => API.request('auth/register', 'POST', { name, email, password }),
+    verify: () => API.request('auth/verify'),
+  },
+  users: {
+    getAll: () => API.request('users'),
+    create: (user) => API.request('users', 'POST', user),
+    update: (id, user) => API.request(`users/${id}`, 'PUT', user),
+    delete: (id) => API.request(`users/${id}`, 'DELETE'),
+  },
+  company: {
+    get: () => API.request('company'),
+    save: (company) => API.request('company', 'POST', company),
+  },
+  catalog: {
+    getAll: () => API.request('catalog'),
+    get: (id) => API.request(`catalog/${id}`),
+    create: (item) => API.request('catalog', 'POST', item),
+    update: (id, item) => API.request(`catalog/${id}`, 'PUT', item),
+    delete: (id) => API.request(`catalog/${id}`, 'DELETE'),
+  },
+  clients: {
+    getAll: () => API.request('clients'),
+    get: (id) => API.request(`clients/${id}`),
+    create: (client) => API.request('clients', 'POST', client),
+    update: (id, client) => API.request(`clients/${id}`, 'PUT', client),
+    delete: (id) => API.request(`clients/${id}`, 'DELETE'),
+  },
+  quotes: {
+    getAll: () => API.request('quotes'),
+    get: (id) => API.request(`quotes/${id}`),
+    create: (quote) => API.request('quotes', 'POST', quote),
+    update: (id, quote) => API.request(`quotes/${id}`, 'PUT', quote),
+    delete: (id) => API.request(`quotes/${id}`, 'DELETE'),
+  },
+  stats: { get: () => API.request('stats') }
+};
+
+const helpers = {
+  formatDate: (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  },
+  formatMoney: (amount, currency = 'KES') =>
+    `${currency} ${Number(amount || 0).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+  fmt: (n) => Number(n || 0).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  today: () => new Date().toISOString().slice(0, 10),
+  addDays: (date, days) => { const r = new Date(date); r.setDate(r.getDate() + days); return r.toISOString().slice(0, 10); },
+};
+
+// ─── Quote preview renderer ───────────────────────────────────────────────────
+// Renders a quote in the exact layout of the Cayan Events Ke. PDF template.
+// The quote object shape mirrors what the API returns:
+//   { number, quote_date, valid_until, client_name, client_company, venue,
+//     no_of_guests, contact_person, subtotal, vat_rate, vat_amount, total,
+//     notes, items: [{ section, subsection, name, qty, unit_price, price }] }
+// Sections and subsections are colour-coded rows (maroon / dark).
+
+function renderCayanLogo() {
+  // Inline SVG approximation of the Cayan crescent/feather logo
+  return `<svg class="cayan-logo-svg" viewBox="0 0 120 110" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="gld" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#d4af37"/>
+        <stop offset="100%" stop-color="#8B6914"/>
+      </radialGradient>
+    </defs>
+    <!-- Outer crescent arc -->
+    <path d="M60,10 C30,10 10,35 10,60 C10,85 30,100 60,100 C45,85 38,72 38,60 C38,48 45,32 60,10 Z"
+          fill="url(#gld)" opacity="0.85"/>
+    <!-- Inner decorative feathers/leaves -->
+    <ellipse cx="72" cy="38" rx="18" ry="6" fill="#c9a227" transform="rotate(-35 72 38)" opacity="0.9"/>
+    <ellipse cx="78" cy="55" rx="18" ry="5" fill="#b8941e" transform="rotate(-10 78 55)" opacity="0.8"/>
+    <ellipse cx="74" cy="72" rx="16" ry="5" fill="#c9a227" transform="rotate(20 74 72)" opacity="0.75"/>
+    <!-- Centre stem -->
+    <line x1="60" y1="10" x2="60" y2="100" stroke="#8B6914" stroke-width="1.5" opacity="0.5"/>
+  </svg>`;
+}
+
+function groupItemsBySection(items) {
+  // items: [{ section, subsection?, name, qty, unit_price, price }]
+  const groups = [];
+  let currentSection = null;
+  let currentSubsection = null;
+
+  for (const item of items) {
+    if (item.section && item.section !== currentSection) {
+      currentSection = item.section;
+      currentSubsection = null;
+      groups.push({ type: 'section', label: item.section });
+    }
+    if (item.subsection && item.subsection !== currentSubsection) {
+      currentSubsection = item.subsection;
+      groups.push({ type: 'subsection', label: item.subsection });
+    }
+    if (item.subtotal_label) {
+      groups.push({ type: 'subtotal', label: item.subtotal_label, amount: item.price });
+    } else {
+      groups.push({ type: 'item', item });
+    }
+  }
+  return groups;
+}
+
+function renderQuotePreviewHTML(quote, company) {
+  const c = company || {};
+  const phone = c.phone || '0737 611 658';
+  const email = c.email || 'cayaneventsanddecor@gmail.com';
+  const address = c.address || 'Mokoyeti West Road, Karen';
+  const companyName = c.name || 'Cayan Events Ke.';
+  const logo = c.logo || null; // base64
+  const currency = c.currency || 'KES';
+  const vatRate = Number(quote.vat_rate || 16);
+  const subtotal = Number(quote.subtotal || 0);
+  const vatAmount = Number(quote.vat_amount || (subtotal * vatRate / 100));
+  const total = Number(quote.total || (subtotal + vatAmount));
+  const items = quote.items || [];
+  const groups = groupItemsBySection(items);
+
+  // Build table rows
+  let rowHtml = '';
+  let rowIdx = 0;
+  for (const g of groups) {
+    if (g.type === 'section') {
+      rowHtml += `<tr class="qp-section-row"><td colspan="4">${g.label}</td></tr>`;
+      rowIdx = 0;
+    } else if (g.type === 'subsection') {
+      rowHtml += `<tr class="qp-subsection-row"><td colspan="4">${g.label}</td></tr>`;
+      rowIdx = 0;
+    } else if (g.type === 'subtotal') {
+      rowHtml += `<tr class="qp-subtotal-row">
+        <td colspan="2"></td>
+        <td>${g.label}</td>
+        <td>${helpers.fmt(g.amount)}</td>
+      </tr>`;
+    } else if (g.type === 'item') {
+      const it = g.item;
+      const evenClass = rowIdx % 2 === 0 ? '' : 'even';
+      rowIdx++;
+      rowHtml += `<tr class="${evenClass}">
+        <td style="text-align:center;">${it.qty || ''}</td>
+        <td>${it.name || ''}</td>
+        <td>${it.unit_price ? helpers.fmt(it.unit_price) : ''}</td>
+        <td>${it.price ? helpers.fmt(it.price) : ''}</td>
+      </tr>`;
+    }
+  }
+
+  const logoHtml = logo
+    ? `<img src="${logo}" alt="Logo" class="qp-logo-img"/>`
+    : renderCayanLogo();
+
+  return `
+  <div class="qp-controls">
+    <button onclick="window.print()" style="background:#2563EB;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">🖨 Print / Save PDF</button>
+    <button onclick="document.querySelector('.quote-preview-overlay').remove()" style="background:#374151;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">✕ Close</button>
+  </div>
+
+  <!-- ── HEADER ── -->
+  <div class="qp-header">
+    <div class="qp-logo-area">
+      ${logoHtml}
+      <div class="qp-logo-text">${companyName}</div>
+    </div>
+    <div class="qp-contact-info">
+      <div><strong>Phone:</strong> ${phone}</div>
+      <div><strong>E-mail:</strong> <span style="text-decoration:underline;color:#1a0dab;">${email}</span></div>
+      <div><strong>Address:</strong> ${address}</div>
+    </div>
+  </div>
+
+  <!-- ── TITLE + META ── -->
+  <div class="qp-title-block">
+    <h1>QUOTATION</h1>
+    <div class="qp-meta">
+      <div><strong>Statement No :</strong> ${quote.number || ''}</div>
+      <div><strong>Bill to:</strong> ${quote.client_name || ''}</div>
+      <div><strong>Venue:</strong> ${quote.venue || 'NAIROBI'}</div>
+      <div><strong>No of Guests:</strong> ${quote.no_of_guests || ''}</div>
+      <div><strong>Date:</strong> ${quote.quote_date ? helpers.formatDate(quote.quote_date) : ''}</div>
+      <div><strong>Contact Person:</strong> ${quote.contact_person || quote.client_name || ''}</div>
+    </div>
+  </div>
+
+  <!-- ── ITEMS TABLE ── -->
+  <table class="qp-table">
+    <thead>
+      <tr>
+        <th style="width:8%;">Qty</th>
+        <th style="width:56%;">Description</th>
+        <th style="width:18%;">Unit Price</th>
+        <th style="width:18%;">Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowHtml}
+    </tbody>
+  </table>
+
+  <!-- ── TOTALS ── -->
+  <table class="qp-totals-table">
+    <tr>
+      <td colspan="2" style="border-top:2px solid #bbb;"></td>
+    </tr>
+    <tr>
+      <td class="total-label" style="font-weight:700;">TOTAL</td>
+      <td style="text-align:right;font-weight:700;">${helpers.fmt(subtotal)}</td>
+    </tr>
+    <tr>
+      <td>VAT ${vatRate}%</td>
+      <td style="text-align:right;">${helpers.fmt(vatAmount)}</td>
+    </tr>
+    <tr class="total-grand">
+      <td style="padding:5px 8px;">TOTAL VAT INC.</td>
+      <td style="text-align:right;padding:5px 8px;">${helpers.fmt(total)}</td>
+    </tr>
+  </table>
+
+  <!-- ── TERMS AND CONDITIONS ── -->
+  <div class="qp-terms-header">Terms and Conditions</div>
+  <ul class="qp-terms-list">
+    <li>Full payment before delivery.</li>
+    <li>The client by signing of this agreement, authorizes ${companyName} the sole responsibility of supplying and arranging the above facilities.</li>
+    <li>The client agrees to forfeit the full deposit paid upon booking of the items against cancellation of an order, as this hinder ${companyName} against confirming other orders.</li>
+    <li>It is understood and agreed that ${companyName} has no obligation to deliver or provide the required equipment until the full payment has been made not withstanding a booking having been confirmed.</li>
+    <li>The client agrees to safe guard the equipment and be solely responsible for any loss or damage of the same, that may occur while under the Clients' responsibility or in their premises.</li>
+    <li>The client, by signature of this agreement, indemnifies ${companyName} its owners, successors or assignees from all and any claims arising out of loss, injury, damage or any claim by use of this equipment, and further indemnifies ${companyName} from any claim which may arise as result of this agreement.</li>
+  </ul>
+
+  <!-- ── SIGNATURE ── -->
+  <div class="qp-signature">
+    <p>Regards,</p>
+    <div class="qp-sig-row">
+      <div>
+        <p style="font-weight:600;">${quote.client_name || ''}</p>
+      </div>
+      <div>
+        <p>Signature: __________________________</p>
+      </div>
+      <div>
+        <p>Date: ${quote.quote_date ? helpers.formatDate(quote.quote_date) : '______________'}</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:7pt;color:#aaa;margin-top:24px;">Page 1</div>
+  `;
+}
+
+function showQuotePreview(quote, company) {
+  // Remove any existing overlay
+  const existing = document.querySelector('.quote-preview-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'quote-preview-overlay';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'quote-preview-wrapper';
+  wrapper.innerHTML = renderQuotePreviewHTML(quote, company);
+
+  overlay.appendChild(wrapper);
+  document.body.appendChild(overlay);
+
+  // Close on backdrop click
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+// ─── App State ────────────────────────────────────────────────────────────────
+const app = {
+  state: {
+    page: 'auth', authMode: 'login',
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    view: 'dashboard', loading: true, toast: null,
+    company: {}, catalog: [], clients: [], quotes: [], users: [],
+    editQuote: null,
+  },
+
+  notify(msg, type = 'success') {
+    this.state.toast = { msg, type };
+    this.render();
+    setTimeout(() => { this.state.toast = null; this.render(); }, 3200);
+  },
+  setView(view) { this.state.view = view; this.render(); },
+
+  async handleLogin(email, password) {
+    const result = await API.auth.login(email, password);
+    if (result.success) {
+      localStorage.setItem('auth_token', result.token);
+      localStorage.setItem('user', JSON.stringify(result.user));
+      this.state.user = result.user;
+      this.state.page = 'app';
+      this.loadAppData();
+      this.render();
+    } else { this.notify(result.error, 'error'); }
+  },
+
+  async handleRegister(name, email, password) {
+    const result = await API.auth.register(name, email, password);
+    if (result.success) {
+      this.notify(result.message, 'success');
+      this.state.authMode = 'login';
+      this.render();
+    } else { this.notify(result.error, 'error'); }
+  },
+
+  handleLogout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    this.state.user = null;
+    this.state.page = 'auth';
+    this.state.view = 'dashboard';
+    this.render();
+  },
+
+  async loadAppData() {
+    const [company, catalog, clients, quotes, stats] = await Promise.all([
+      API.company.get(), API.catalog.getAll(), API.clients.getAll(),
+      API.quotes.getAll(), API.stats.get(),
+    ]);
+    this.state.company = company || {};
+    this.state.catalog = catalog || [];
+    this.state.clients = clients || [];
+    this.state.quotes = quotes || [];
+    this.state.stats = stats || {};
+    this.state.loading = false;
+    this.render();
+  },
+
+  render() {
+    const el = document.getElementById('app');
+    if (this.state.loading) {
+      el.innerHTML = `<div class="loader"><div class="loader-content"><div class="loader-icon">📋</div><div class="loader-text">Loading QuoteSystem...</div></div></div>`;
+      return;
+    }
+    if (this.state.page === 'auth') {
+      el.innerHTML = this.renderAuth();
+    } else {
+      el.innerHTML = this.renderAppShell();
+    }
+    if (this.state.toast) {
+      const t = document.createElement('div');
+      t.className = `toast ${this.state.toast.type}`;
+      t.innerHTML = `${this.state.toast.type === 'success' ? '✓' : '⚠'} ${this.state.toast.msg}`;
+      el.appendChild(t);
+    }
+    this.bindEvents();
+  },
+
+  renderAuth() {
+    const m = this.state.authMode;
+    return `<div class="auth-screen">
+      <div class="auth-left">
+        <div style="font-size:56px;margin-bottom:16px;">📋</div>
+        <h1 style="color:#fff;font-size:30px;font-weight:800;margin:0 0 10px;text-align:center;">Quote Management</h1>
+        <p style="color:rgba(255,255,255,0.55);text-align:center;line-height:1.7;max-width:300px;font-size:14px;">Professional quotations, client management, and item catalog — all in one place.</p>
+      </div>
+      <div class="auth-right">
+        <h2 style="font-size:22px;font-weight:800;color:var(--navy);margin:0 0 4px;">${m === 'login' ? 'Welcome back' : 'Create account'}</h2>
+        <p style="color:var(--gray);font-size:13px;margin:0 0 28px;">${m === 'login' ? 'Sign in to continue.' : 'Register for access.'}</p>
+        <div style="display:flex;background:var(--bg);border-radius:8px;padding:4px;margin-bottom:24px;">
+          <button class="auth-mode-btn" data-mode="login" style="flex:1;padding:8px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:${m==='login'?'#fff':'transparent'};color:${m==='login'?'var(--navy)':'var(--gray)'};">Sign In</button>
+          <button class="auth-mode-btn" data-mode="register" style="flex:1;padding:8px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:${m==='register'?'#fff':'transparent'};color:${m==='register'?'var(--navy)':'var(--gray)'};">Register</button>
+        </div>
+        ${m === 'register' ? '<div class="form-group"><label>Full Name</label><input type="text" id="reg-name" class="input-field" placeholder="Your full name"></div>' : ''}
+        <div class="form-group"><label>Email</label><input type="email" id="auth-email" class="input-field" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="auth-password" class="input-field" placeholder="Min. 6 characters"></div>
+        <button id="auth-submit" class="button navy" style="width:100%;justify-content:center;padding:12px;margin-top:16px;">
+          ${m === 'login' ? 'Sign In →' : 'Submit Registration'}
+        </button>
+        ${m === 'login' ? '<p style="text-align:center;font-size:11px;color:#9CA3AF;margin:14px 0 0;">Default: admin@company.com / admin123</p>' : ''}
+      </div>
+    </div>`;
+  },
+
+  renderAppShell() {
+    const navItems = [
+      { id: 'dashboard', emoji: '⊞', label: 'Dashboard' },
+      { id: 'newquote',  emoji: '📝', label: 'New Quote' },
+      { id: 'quotes',    emoji: '📄', label: 'All Quotes' },
+      { id: 'catalog',   emoji: '📦', label: 'Catalog' },
+      { id: 'clients',   emoji: '👥', label: 'Clients' },
+      ...(this.state.user?.role === 'admin' ? [{ id: 'users', emoji: '🔑', label: 'Users' }] : []),
+      { id: 'settings',  emoji: '⚙️', label: 'Settings' },
+    ];
+    return `<div class="container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">📋</div>
+          <div class="company-name">${this.state.company.name || 'QuoteSystem'}</div>
+          <div class="user-name">${this.state.user?.name || ''}</div>
+          <div class="role-badge">${(this.state.user?.role || '').toUpperCase()}</div>
+        </div>
+        <nav>${navItems.map(i => `<button class="nav-item ${this.state.view === i.id ? 'active' : ''}" data-view="${i.id}"><span>${i.emoji}</span>${i.label}</button>`).join('')}</nav>
+        <div class="sidebar-footer"><button id="logout-btn" class="logout-btn">🚪 Sign Out</button></div>
+      </aside>
+      <main class="main">${this.renderViewContent()}</main>
+    </div>`;
+  },
+
+  renderViewContent() {
+    switch (this.state.view) {
+      case 'dashboard': return this.renderDashboard();
+      case 'newquote':  return this.renderNewQuote();
+      case 'quotes':    return this.renderQuotesList();
+      case 'catalog':   return this.renderCatalog();
+      case 'clients':   return this.renderClients();
+      case 'users':     return this.renderUsers();
+      case 'settings':  return this.renderSettings();
+      default: return '';
+    }
+  },
+
+  renderDashboard() {
+    const s = this.state.stats || {};
+    return `<div style="max-width:1100px;">
+      <div class="page-header">
+        <div><h2 class="page-title">Dashboard</h2><p class="page-subtitle">Overview of your quotation activity</p></div>
+        <button class="button" onclick="app.setView('newquote')">+ New Quote</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-label">Total Quotes</div><div class="stat-value">${s.total_quotes || 0}</div></div>
+        <div class="stat-card" style="border-top-color:var(--green);"><div class="stat-icon">💰</div><div class="stat-label">Total Value</div><div class="stat-value" style="font-size:15px;">${helpers.formatMoney(s.total_value, this.state.company.currency)}</div></div>
+        <div class="stat-card" style="border-top-color:var(--amber);"><div class="stat-icon">⏳</div><div class="stat-label">Pending</div><div class="stat-value">${s.pending || 0}</div></div>
+        <div class="stat-card" style="border-top-color:var(--green);"><div class="stat-icon">✅</div><div class="stat-label">Accepted</div><div class="stat-value">${s.accepted || 0}</div></div>
+        <div class="stat-card" style="border-top-color:#7C3AED;"><div class="stat-icon">👥</div><div class="stat-label">Clients</div><div class="stat-value">${s.clients || 0}</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:14px;font-size:15px;font-weight:800;">Recent Quotes</h3>
+        ${this.renderQuotesTable(this.state.quotes.slice(0, 5))}
+      </div>
+    </div>`;
+  },
+
+  renderQuotesList() {
+    return `<div style="max-width:1100px;">
+      <div class="page-header">
+        <div><h2 class="page-title">All Quotes</h2><p class="page-subtitle">${this.state.quotes.length} total quotes</p></div>
+        <button class="button" onclick="app.setView('newquote')">+ New Quote</button>
+      </div>
+      <div class="card">${this.renderQuotesTable(this.state.quotes)}</div>
+    </div>`;
+  },
+
+  renderQuotesTable(quotes) {
+    if (!quotes || quotes.length === 0) {
+      return `<p style="text-align:center;color:var(--gray);padding:30px;">No quotes yet. <a href="#" onclick="app.setView('newquote')" style="color:var(--blue);">Create your first quote</a>.</p>`;
+    }
+    const statusColor = { draft: '#6B7280', pending: '#D97706', accepted: '#059669', declined: '#DC2626' };
+    return `<table>
+      <thead><tr>
+        <th>Quote #</th><th>Client</th><th>Date</th><th>Total</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${quotes.map(q => `
+        <tr>
+          <td><strong>${q.number || ''}</strong></td>
+          <td>${q.client_name || ''}</td>
+          <td>${helpers.formatDate(q.quote_date)}</td>
+          <td><strong>${helpers.formatMoney(q.total, this.state.company.currency || 'KES')}</strong></td>
+          <td><span style="background:${statusColor[q.status]||'#6B7280'}22;color:${statusColor[q.status]||'#6B7280'};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">${q.status || 'draft'}</span></td>
+          <td>
+            <button class="button secondary" style="padding:5px 10px;font-size:12px;" data-preview-quote="${q.id}">👁 Preview</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  },
+
+  // ── NEW QUOTE FORM ──────────────────────────────────────────────────────────
+  renderNewQuote() {
+    const clients = this.state.clients || [];
+    const catalog = this.state.catalog || [];
+    return `<div style="max-width:900px;">
+      <div class="page-header">
+        <div><h2 class="page-title">New Quote</h2><p class="page-subtitle">Create a professional quotation</p></div>
+      </div>
+      <div class="card">
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label>Client</label>
+            <select id="nq-client" class="input-field" style="margin-bottom:0;">
+              <option value="">-- Select Client --</option>
+              ${clients.map(c => `<option value="${c.id}" data-name="${c.name}" data-contact="${c.contact_person||c.name}">${c.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Venue</label>
+            <input type="text" id="nq-venue" class="input-field" placeholder="e.g. NAIROBI" style="margin-bottom:0;">
+          </div>
+          <div class="form-group">
+            <label>No. of Guests</label>
+            <input type="text" id="nq-guests" class="input-field" placeholder="e.g. 500PAX" style="margin-bottom:0;">
+          </div>
+          <div class="form-group">
+            <label>Quote Date</label>
+            <input type="date" id="nq-date" class="input-field" value="${helpers.today()}" style="margin-bottom:0;">
+          </div>
+          <div class="form-group">
+            <label>VAT Rate (%)</label>
+            <input type="number" id="nq-vat" class="input-field" value="16" min="0" max="100" style="margin-bottom:0;">
+          </div>
+          <div class="form-group">
+            <label>Contact Person</label>
+            <input type="text" id="nq-contact" class="input-field" placeholder="Contact name" style="margin-bottom:0;">
+          </div>
+        </div>
+
+        <!-- Line items -->
+        <h3 style="font-size:14px;font-weight:800;margin:18px 0 10px;">Line Items</h3>
+        <div id="nq-items-container">
+          ${this.renderNewQuoteItemRow(0)}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="button secondary" id="nq-add-item">+ Add Item</button>
+          <button class="button secondary" id="nq-add-section">+ Add Section Header</button>
+        </div>
+
+        <!-- Totals preview -->
+        <div style="margin-top:20px;text-align:right;">
+          <div style="font-size:13px;margin-bottom:4px;">Subtotal: <strong id="nq-subtotal">KES 0.00</strong></div>
+          <div style="font-size:13px;margin-bottom:4px;">VAT (<span id="nq-vat-pct">16</span>%): <strong id="nq-vat-amt">KES 0.00</strong></div>
+          <div style="font-size:16px;font-weight:900;color:var(--navy);">Total: <span id="nq-total">KES 0.00</span></div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px;justify-content:flex-end;">
+          <button class="button secondary" id="nq-preview-btn">👁 Preview Quote</button>
+          <button class="button green" id="nq-save-btn">💾 Save Quote</button>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  renderNewQuoteItemRow(idx, type = 'item') {
+    if (type === 'section') {
+      return `<div class="nq-row" data-type="section" data-idx="${idx}" style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
+        <input type="text" class="nq-section-name input-field" placeholder="Section name (e.g. CHURCH SETUP)" style="flex:1;margin:0;background:#8B1A1A;color:#fff;font-weight:700;">
+        <select class="nq-section-type input-field" style="width:160px;margin:0;">
+          <option value="section">Section (Red)</option>
+          <option value="subsection">Subsection (Dark)</option>
+        </select>
+        <button class="nq-remove-row button red" style="padding:6px 10px;" title="Remove">✕</button>
+      </div>`;
+    }
+    return `<div class="nq-row" data-type="item" data-idx="${idx}" style="display:flex;gap:6px;margin-bottom:5px;align-items:center;">
+      <input type="number" class="nq-qty input-field" placeholder="Qty" style="width:70px;margin:0;" min="0">
+      <input type="text" class="nq-name input-field" placeholder="Description" style="flex:1;margin:0;">
+      <input type="number" class="nq-unit-price input-field" placeholder="Unit Price" style="width:130px;margin:0;" min="0" step="0.01">
+      <input type="text" class="nq-price-display input-field" placeholder="Amount" style="width:130px;margin:0;background:#f9f9f9;" readonly>
+      <button class="nq-remove-row button red" style="padding:6px 10px;" title="Remove">✕</button>
+    </div>`;
+  },
+
+  calcNewQuoteTotals() {
+    const vatRate = parseFloat(document.getElementById('nq-vat')?.value || 16) / 100;
+    let subtotal = 0;
+    document.querySelectorAll('.nq-row[data-type="item"]').forEach(row => {
+      const qty = parseFloat(row.querySelector('.nq-qty')?.value || 0);
+      const up = parseFloat(row.querySelector('.nq-unit-price')?.value || 0);
+      const amount = qty * up;
+      const priceDisplay = row.querySelector('.nq-price-display');
+      if (priceDisplay) priceDisplay.value = amount > 0 ? amount.toFixed(2) : '';
+      subtotal += amount;
+    });
+    const vatAmt = subtotal * vatRate;
+    const total = subtotal + vatAmt;
+    const curr = this.state.company.currency || 'KES';
+    const el = (id) => document.getElementById(id);
+    if (el('nq-subtotal')) el('nq-subtotal').textContent = helpers.formatMoney(subtotal, curr);
+    if (el('nq-vat-pct')) el('nq-vat-pct').textContent = (vatRate * 100).toFixed(0);
+    if (el('nq-vat-amt')) el('nq-vat-amt').textContent = helpers.formatMoney(vatAmt, curr);
+    if (el('nq-total')) el('nq-total').textContent = helpers.formatMoney(total, curr);
+    return { subtotal, vatRate: vatRate * 100, vatAmount: vatAmt, total };
+  },
+
+  collectNewQuoteData() {
+    const clientSel = document.getElementById('nq-client');
+    const clientOpt = clientSel?.selectedOptions[0];
+    const clientId = clientSel?.value;
+    const clientName = clientOpt?.dataset.name || '';
+    const contactPerson = document.getElementById('nq-contact')?.value || clientOpt?.dataset.contact || clientName;
+    const venue = document.getElementById('nq-venue')?.value || '';
+    const noOfGuests = document.getElementById('nq-guests')?.value || '';
+    const quoteDate = document.getElementById('nq-date')?.value || helpers.today();
+    const { subtotal, vatRate, vatAmount, total } = this.calcNewQuoteTotals();
+
+    const items = [];
+    document.querySelectorAll('.nq-row').forEach(row => {
+      const type = row.dataset.type;
+      if (type === 'section') {
+        const sectionType = row.querySelector('.nq-section-type')?.value || 'section';
+        const label = row.querySelector('.nq-section-name')?.value || '';
+        items.push({ [sectionType]: label });
+      } else {
+        const qty = parseFloat(row.querySelector('.nq-qty')?.value || 0);
+        const name = row.querySelector('.nq-name')?.value || '';
+        const unit_price = parseFloat(row.querySelector('.nq-unit-price')?.value || 0);
+        const price = qty * unit_price;
+        if (name || qty) items.push({ name, qty, unit_price, price });
+      }
+    });
+
+    return {
+      client_id: clientId,
+      client_name: clientName,
+      venue, no_of_guests: noOfGuests,
+      contact_person: contactPerson,
+      quote_date: quoteDate,
+      vat_rate: vatRate,
+      vat_amount: vatAmount,
+      subtotal, total,
+      items,
+    };
+  },
+
+  buildPreviewQuote(data) {
+    // Convert flat items array (with section/subsection keys) to the groups format
+    const previewItems = [];
+    for (const it of (data.items || [])) {
+      if (it.section) { previewItems.push({ section: it.section }); }
+      else if (it.subsection) { previewItems.push({ subsection: it.subsection }); }
+      else { previewItems.push(it); }
+    }
+    return { ...data, items: previewItems };
+  },
+
+  renderCatalog() {
+    const items = this.state.catalog || [];
+    return `<div style="max-width:900px;">
+      <div class="page-header">
+        <div><h2 class="page-title">Catalog</h2><p class="page-subtitle">${items.length} items</p></div>
+        <button class="button" id="cat-add-btn">+ Add Item</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Name</th><th>Category</th><th>Unit</th><th>Actions</th></tr></thead>
+          <tbody>${items.length ? items.map(i => `<tr><td>${i.name}</td><td>${i.category||''}</td><td>${i.unit||''}</td><td><button class="button red" style="padding:4px 10px;font-size:11px;" data-del-catalog="${i.id}">Delete</button></td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px;">No catalog items yet.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+  },
+
+  renderClients() {
+    const clients = this.state.clients || [];
+    return `<div style="max-width:900px;">
+      <div class="page-header">
+        <div><h2 class="page-title">Clients</h2><p class="page-subtitle">${clients.length} clients</p></div>
+        <button class="button" id="cli-add-btn">+ Add Client</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Contact Person</th><th>Actions</th></tr></thead>
+          <tbody>${clients.length ? clients.map(c => `<tr><td>${c.name}</td><td>${c.email||''}</td><td>${c.phone||''}</td><td>${c.contact_person||''}</td><td><button class="button red" style="padding:4px 10px;font-size:11px;" data-del-client="${c.id}">Delete</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:20px;">No clients yet.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+  },
+
+  renderUsers() {
+    const users = this.state.users || [];
+    return `<div style="max-width:900px;">
+      <div class="page-header">
+        <div><h2 class="page-title">Users</h2></div>
+        <button class="button" id="usr-add-btn">+ Add User</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>${users.length ? users.map(u => `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.verified?'✅ Verified':'⏳ Pending'}</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px;">No users.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+  },
+
+  renderSettings() {
+    const c = this.state.company || {};
+    return `<div style="max-width:700px;">
+      <div class="page-header">
+        <div><h2 class="page-title">Company Settings</h2></div>
+      </div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="form-group full"><label>Company Name</label><input type="text" id="set-name" class="input-field" value="${c.name||''}" placeholder="Cayan Events Ke."></div>
+          <div class="form-group"><label>Phone</label><input type="text" id="set-phone" class="input-field" value="${c.phone||''}" placeholder="0737 611 658"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="set-email" class="input-field" value="${c.email||''}" placeholder="info@example.com"></div>
+          <div class="form-group full"><label>Address</label><input type="text" id="set-address" class="input-field" value="${c.address||''}" placeholder="Mokoyeti West Road, Karen"></div>
+          <div class="form-group"><label>Currency</label><input type="text" id="set-currency" class="input-field" value="${c.currency||'KES'}" placeholder="KES"></div>
+          <div class="form-group full"><label>Terms &amp; Conditions</label><textarea id="set-terms" class="input-field" rows="5" placeholder="Your standard terms...">${c.terms||''}</textarea></div>
+          <div class="form-group full"><label>Company Logo (base64 or URL)</label><input type="text" id="set-logo" class="input-field" value="${c.logo||''}" placeholder="Paste base64 logo data..."></div>
+        </div>
+        <button class="button green" id="set-save-btn">💾 Save Settings</button>
+      </div>
+    </div>`;
+  },
+
+  bindEvents() {
+    // Auth
+    document.querySelectorAll('.auth-mode-btn').forEach(b => b.addEventListener('click', (e) => {
+      this.state.authMode = e.target.dataset.mode; this.render();
+    }));
+    const authSub = document.getElementById('auth-submit');
+    if (authSub) authSub.addEventListener('click', async () => {
+      const email = document.getElementById('auth-email')?.value;
+      const password = document.getElementById('auth-password')?.value;
+      if (this.state.authMode === 'login') {
+        if (!email || !password) { this.notify('Enter email and password', 'error'); return; }
+        await this.handleLogin(email, password);
+      } else {
+        const name = document.getElementById('reg-name')?.value;
+        if (!name || !email || !password) { this.notify('All fields required', 'error'); return; }
+        await this.handleRegister(name, email, password);
+      }
+    });
+
+    // Nav
+    document.querySelectorAll('.nav-item').forEach(b => b.addEventListener('click', (e) => this.setView(e.currentTarget.dataset.view)));
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', () => this.handleLogout());
+
+    // Quote previews from list/dashboard
+    document.querySelectorAll('[data-preview-quote]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.currentTarget.dataset.previewQuote;
+        const quote = await API.quotes.get(id);
+        showQuotePreview(quote, this.state.company);
+      });
+    });
+
+    // New Quote interactions
+    const nqContainer = document.getElementById('nq-items-container');
+    if (nqContainer) {
+      // Delegate: remove row
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('nq-remove-row')) {
+          e.target.closest('.nq-row')?.remove();
+          this.calcNewQuoteTotals();
+        }
+      }, { once: true });
+
+      // Section type change → update background
+      document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('nq-section-type')) {
+          const input = e.target.closest('.nq-row')?.querySelector('.nq-section-name');
+          if (input) {
+            input.style.background = e.target.value === 'subsection' ? '#2c2c2c' : '#8B1A1A';
+          }
+        }
+        if (e.target.classList.contains('nq-qty') || e.target.classList.contains('nq-unit-price') || e.target.id === 'nq-vat') {
+          this.calcNewQuoteTotals();
+        }
+      }, { once: true });
+
+      // Add item
+      let rowIdx = 1;
+      document.getElementById('nq-add-item')?.addEventListener('click', () => {
+        nqContainer.insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++));
+        this.bindNewQuoteRowEvents();
+      });
+      document.getElementById('nq-add-section')?.addEventListener('click', () => {
+        nqContainer.insertAdjacentHTML('beforeend', this.renderNewQuoteItemRow(rowIdx++, 'section'));
+        this.bindNewQuoteRowEvents();
+      });
+
+      // Preview
+      document.getElementById('nq-preview-btn')?.addEventListener('click', () => {
+        this.calcNewQuoteTotals();
+        const data = this.collectNewQuoteData();
+        const preview = this.buildPreviewQuote(data);
+        preview.number = 'PREVIEW';
+        showQuotePreview(preview, this.state.company);
+      });
+
+      // Save
+      document.getElementById('nq-save-btn')?.addEventListener('click', async () => {
+        this.calcNewQuoteTotals();
+        const data = this.collectNewQuoteData();
+        if (!data.client_id) { this.notify('Please select a client', 'error'); return; }
+        const result = await API.quotes.create(data);
+        if (result.id || result.success) {
+          this.notify('Quote saved!', 'success');
+          await this.loadAppData();
+          this.state.view = 'quotes';
+          this.render();
+        } else { this.notify(result.error || 'Failed to save quote', 'error'); }
+      });
+
+      // Initial calc
+      this.calcNewQuoteTotals();
+      this.bindNewQuoteRowEvents();
+    }
+
+    // Client select → fill contact person
+    document.getElementById('nq-client')?.addEventListener('change', (e) => {
+      const opt = e.target.selectedOptions[0];
+      const cp = document.getElementById('nq-contact');
+      if (cp && opt) cp.value = opt.dataset.contact || '';
+    });
+
+    // Settings save
+    document.getElementById('set-save-btn')?.addEventListener('click', async () => {
+      const company = {
+        name: document.getElementById('set-name')?.value,
+        phone: document.getElementById('set-phone')?.value,
+        email: document.getElementById('set-email')?.value,
+        address: document.getElementById('set-address')?.value,
+        currency: document.getElementById('set-currency')?.value,
+        terms: document.getElementById('set-terms')?.value,
+        logo: document.getElementById('set-logo')?.value,
+      };
+      const result = await API.company.save(company);
+      if (result.success) { this.state.company = { ...this.state.company, ...company }; this.notify('Settings saved!'); }
+      else { this.notify(result.error || 'Failed to save', 'error'); }
+    });
+  },
+
+  bindNewQuoteRowEvents() {
+    // Re-bind remove & calc on newly added rows
+    document.querySelectorAll('.nq-remove-row').forEach(btn => {
+      btn.onclick = () => { btn.closest('.nq-row')?.remove(); this.calcNewQuoteTotals(); };
+    });
+    document.querySelectorAll('.nq-qty, .nq-unit-price').forEach(inp => {
+      inp.oninput = () => this.calcNewQuoteTotals();
+    });
+    document.querySelectorAll('.nq-section-type').forEach(sel => {
+      sel.onchange = (e) => {
+        const input = sel.closest('.nq-row')?.querySelector('.nq-section-name');
+        if (input) input.style.background = e.target.value === 'subsection' ? '#2c2c2c' : '#8B1A1A';
+      };
+    });
+    document.getElementById('nq-vat')?.addEventListener('input', () => this.calcNewQuoteTotals());
+  }
+};
+
+// Boot
+window.addEventListener('load', async () => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    const verified = await API.auth.verify();
+    if (verified.valid) {
+      app.state.user = verified.user;
+      app.state.page = 'app';
+      app.loadAppData();
+    } else { app.state.loading = false; app.render(); }
+  } else { app.state.loading = false; app.render(); }
+});
+</script>
 </body>
 </html>
