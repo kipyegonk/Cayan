@@ -93,7 +93,7 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
   margin-bottom: 14px;
 }
 .qp-logo-area { display: flex; flex-direction: column; gap: 2px; }
-.qp-logo-img { width: 110px; height: 110px; object-fit: contain; }
+.qp-logo-img { width: 90px; height: 90px; object-fit: contain; }
 .qp-logo-text {
   font-size: 14pt; font-weight: 700; color: #c0392b;
   font-style: italic; margin-top: 4px;
@@ -158,8 +158,10 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 /* --- Terms box --- */
 /* Dark red pill header, white italic text */
 .qp-terms-header {
-  display: inline-block; background: #8B1A1A; color: #fff; font-style: italic;
+  display: inline-block !important; background: #8B1A1A !important;
+  color: #fff !important; font-style: italic; font-weight: normal !important;
   padding: 3px 12px; font-size: 8.5pt; margin-top: 8px; border-radius: 3px;
+  border: none !important; text-align: left !important; width: auto !important;
 }
 .qp-terms-list { margin-top: 6px; padding-left: 0; list-style: none; }
 .qp-terms-list li {
@@ -175,22 +177,18 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 .qp-signature { margin-top: 32px; font-size: 9pt; }
 .qp-signature p { margin-bottom: 4px; }
 .qp-sig-row { display: flex; gap: 80px; margin-top: 6px; align-items: flex-start; }
-/* --- Print controls --- */
+/* --- Print controls bar (screen only) --- */
 .qp-controls {
   position: sticky; top: 0; background: #1B2F4E;
   display: flex; gap: 10px; padding: 10px 16px; z-index: 10;
   justify-content: flex-end; border-radius: 0 0 8px 8px;
   margin: -28px -32px 16px;
 }
-@media print {
-  .qp-controls, .sidebar, .main > *:not(.quote-preview-overlay) { display: none !important; }
-  .quote-preview-overlay { position: static; padding: 0; background: none; }
-  .quote-preview-wrapper { box-shadow: none; width: 100%; }
-  .qp-controls { display: none; }
-}
+/* Never print the overlay or app shell — printing is handled via printQuote() */
+@media print { body > * { display: none !important; } }
 
 /* Cayan logo SVG fallback */
-.cayan-logo-svg { width: 110px; height: 96px; }
+.cayan-logo-svg { width: 90px; height: 78px; }
 </style>
 </head>
 <body>
@@ -374,7 +372,7 @@ function renderQuotePreviewHTML(quote, company) {
 
   return `
   <div class="qp-controls">
-    <button onclick="window.print()" style="background:#2563EB;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">🖨 Print / Save PDF</button>
+    <button onclick="printQuote(window.__currentQuote, window.__currentCompany)" style="background:#2563EB;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">🖨 Print / Save PDF</button>
     <button onclick="document.querySelector('.quote-preview-overlay').remove()" style="background:#374151;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">✕ Close</button>
   </div>
 
@@ -478,6 +476,60 @@ function renderQuotePreviewHTML(quote, company) {
   `;
 }
 
+function printQuote(quote, company) {
+  const html = renderQuotePreviewHTML(quote, company);
+  // Strip the control bar from the print HTML
+  const printHtml = html.replace(/<div class="qp-controls">[\s\S]*?<\/div>\s*/, '');
+
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>Quote ${quote.number || ''}</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #111;
+       background: #fff; padding: 28px 32px 40px; }
+.qp-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.qp-logo-area { display:flex; flex-direction:column; gap:2px; }
+.qp-logo-img { width:90px; height:90px; object-fit:contain; }
+.qp-logo-text { font-size:14pt; font-weight:700; color:#c0392b; font-style:italic; margin-top:4px; }
+.qp-contact-info { text-align:left; font-size:8pt; align-self:flex-start; padding-top:8px; }
+.qp-title-block { margin:10px 0 8px; }
+.qp-title-block h1 { font-size:20pt; font-weight:900; letter-spacing:0.06em; text-align:center; margin-bottom:8px; }
+.qp-meta { font-size:8pt; line-height:1.8; }
+.qp-meta strong { font-weight:700; }
+.qp-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:8pt; }
+.qp-table th { background:#760014; color:#D0A95E; padding:5px 7px; text-align:left; font-weight:700; border:1px solid #5a000f; }
+.qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align:right; }
+.qp-table td { padding:3px 7px; border:1px solid #ccc; vertical-align:top; }
+.qp-table td:last-child, .qp-table td:nth-last-child(2) { text-align:right; white-space:nowrap; }
+.qp-section-row td { background:#D0A95E; color:#000; font-weight:700; padding:4px 7px; border:1px solid #b8923f; }
+.qp-subsection-row td { background:#D0A95E; color:#000; font-weight:700; padding:4px 7px; border:1px solid #b8923f; }
+.qp-subtotal-row td { font-weight:700; background:#fff; color:#111; border:1px solid #ccc; padding:4px 7px; }
+.qp-table tbody tr.even td { background:#fafafa; }
+.qp-totals-table { width:300px; margin-left:auto; margin-top:8px; border-collapse:collapse; font-size:9pt; }
+.qp-totals-table td { padding:4px 8px; border:1px solid #ccc; }
+.qp-totals-table .total-label { font-weight:700; }
+.qp-totals-table .total-grand { font-weight:900; font-size:10pt; background:#D0A95E; color:#000; }
+.qp-terms-header { display:inline-block; background:#8B1A1A; color:#fff; font-style:italic;
+  padding:3px 12px; font-size:8.5pt; margin-top:8px; border-radius:3px; }
+.qp-terms-list { margin-top:6px; padding-left:0; list-style:none; }
+.qp-terms-list li { display:flex; gap:8px; margin-bottom:3px; font-size:7.5pt; line-height:1.5; color:#111; align-items:flex-start; }
+.qp-terms-list li::before { content:"□"; font-size:9pt; flex-shrink:0; line-height:1.4; color:#111; }
+.qp-signature { margin-top:32px; font-size:9pt; }
+.qp-signature p { margin-bottom:4px; }
+.qp-sig-row { display:flex; gap:80px; margin-top:6px; align-items:flex-start; }
+.cayan-logo-svg { width:90px; height:78px; }
+@page { margin: 10mm; size: A4; }
+@media print { html,body { height:auto; } }
+</style>
+</head><body>${printHtml}</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); win.close(); }, 600);
+}
+
 function showQuotePreview(quote, company) {
   // Remove any existing overlay
   const existing = document.querySelector('.quote-preview-overlay');
@@ -490,6 +542,8 @@ function showQuotePreview(quote, company) {
   wrapper.className = 'quote-preview-wrapper';
   wrapper.innerHTML = renderQuotePreviewHTML(quote, company);
 
+  window.__currentQuote = quote;
+  window.__currentCompany = company;
   overlay.appendChild(wrapper);
   document.body.appendChild(overlay);
 
