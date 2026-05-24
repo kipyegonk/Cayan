@@ -98,7 +98,7 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
   font-size: 14pt; font-weight: 700; color: #c0392b;
   font-style: italic; margin-top: 4px;
 }
-.qp-contact-info { text-align: right; font-size: 8pt; line-height: 1.7; }
+.qp-contact-info { text-align: left; font-size: 8pt; align-self: flex-start; padding-top: 8px; }
 .qp-contact-info strong { font-weight: 700; }
 /* --- Title block --- */
 .qp-title-block { margin: 10px 0 8px; }
@@ -107,7 +107,7 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 .qp-meta strong { font-weight: 700; }
 /* --- Items table --- */
 /* EXACT colours pixel-sampled from PDF:
-   - Column header row:  #760014  dark maroon bg, #fff WHITE text  (Qty/Description/Unit Price/Price)
+   - Column header row:  #D0A95E  golden/amber bg, #000 BLACK text (Qty/Description/Unit Price/Price) — same as section rows
    - Section rows:       #D0A95E  golden/amber bg, #000 BLACK text (CHURCH SETUP / RECEPTION / FLOWERS / LOGISTICS)
    - Subsection rows:    #D0A95E  same golden bg,  #000 BLACK text (TENT AND DÉCOR etc.)
    - Subtotal rows:      white bg, bold black
@@ -120,9 +120,9 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 }
 /* Column header — dark maroon bg, WHITE text */
 .qp-table th {
-  background: #760014; color: #fff; padding: 5px 7px;
+  background: #D0A95E; color: #000; padding: 5px 7px;
   text-align: left; font-weight: 700; font-size: 8pt;
-  border: 1px solid #5a000f;
+  border: 1px solid #b8923f;
 }
 .qp-table th:last-child, .qp-table th:nth-last-child(2) { text-align: right; }
 .qp-table td {
@@ -159,16 +159,16 @@ label { display: block; font-size: 12px; font-weight: 700; color: #374151; margi
 /* Dark red pill header, white italic text */
 .qp-terms-header {
   display: inline-block; background: #8B1A1A; color: #fff; font-style: italic;
-  padding: 4px 14px; font-size: 9pt; margin-top: 18px; border-radius: 3px;
+  padding: 3px 12px; font-size: 8.5pt; margin-top: 8px; border-radius: 3px;
 }
-.qp-terms-list { margin-top: 8px; padding-left: 0; list-style: none; }
+.qp-terms-list { margin-top: 6px; padding-left: 0; list-style: none; }
 .qp-terms-list li {
-  display: flex; gap: 10px; margin-bottom: 5px;
-  font-size: 8pt; line-height: 1.5; color: #111; align-items: flex-start;
+  display: flex; gap: 8px; margin-bottom: 3px;
+  font-size: 7.5pt; line-height: 1.5; color: #111; align-items: flex-start;
 }
-/* Hollow square — matches the □ bullet in the PDF exactly */
+/* Hollow square □ — exact match for the PDF bullet */
 .qp-terms-list li::before {
-  content: "\25A1"; font-size: 11pt; flex-shrink: 0; line-height: 1.15;
+  content: "\25A1"; font-size: 9pt; flex-shrink: 0; line-height: 1.4;
   color: #111; font-family: Arial, sans-serif;
 }
 /* --- Signature --- */
@@ -385,18 +385,18 @@ function renderQuotePreviewHTML(quote, company) {
       <div class="qp-logo-text">${companyName}</div>
     </div>
     <div class="qp-contact-info">
-      <table style="border:none;border-collapse:collapse;font-size:8pt;line-height:1.9;">
+      <table style="border:none;border-collapse:collapse;font-size:8pt;line-height:1.6;">
         <tr>
-          <td style="font-weight:700;padding:0 4px 0 0;white-space:nowrap;">Phone:</td>
-          <td style="padding:0;">${phone}</td>
+          <td style="font-weight:700;padding:0 3px 0 0;white-space:nowrap;">Phone:</td>
+          <td style="padding:0;white-space:nowrap;">${phone}</td>
         </tr>
         <tr>
-          <td style="font-weight:700;padding:0 4px 0 0;white-space:nowrap;">E-mail:</td>
-          <td style="padding:0;text-decoration:underline;color:#1a0dab;">${email}</td>
+          <td style="font-weight:700;padding:0 3px 0 0;white-space:nowrap;">E-mail:</td>
+          <td style="padding:0;text-decoration:underline;color:#000;white-space:nowrap;">${email}</td>
         </tr>
         <tr>
-          <td style="font-weight:700;padding:0 4px 0 0;white-space:nowrap;">Address</td>
-          <td style="padding:0;">${address}</td>
+          <td style="font-weight:700;padding:0 3px 0 0;white-space:nowrap;">Address</td>
+          <td style="padding:0;white-space:nowrap;">${address}</td>
         </tr>
       </table>
     </div>
@@ -462,13 +462,11 @@ function renderQuotePreviewHTML(quote, company) {
 
   <!-- ── SIGNATURE ── -->
   <div class="qp-signature">
-    <p>Regards,</p>
+    <p style="margin-bottom:1px;">Regards,</p>
+    <p style="margin-bottom:14px;">${quote.client_name || quote.contact_person || ''}</p>
     <div class="qp-sig-row">
-      <div>
-        <p style="font-weight:600;">${quote.client_name || ''}</p>
-      </div>
-      <div>
-        <p>Signature: __________________________</p>
+      <div style="min-width:160px;">
+        <p style="margin-bottom:2px;">Signature: __________________________</p>
       </div>
       <div>
         <p>Date: ${quote.quote_date ? helpers.formatDate(quote.quote_date) : '______________'}</p>

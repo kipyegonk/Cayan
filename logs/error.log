@@ -1,0 +1,4 @@
+[23-May-2026 19:04:36 UTC] PHP Warning:  Undefined array key "vat" in /home/kevin/Downloads/q/api/index.php on line 160
+[23-May-2026 19:04:36 UTC] PHP Warning:  Undefined array key "bank_details" in /home/kevin/Downloads/q/api/index.php on line 164
+[23-May-2026 19:44:45 UTC] PHP Warning:  Undefined array key "vat" in /home/kevin/Downloads/q/api/index.php on line 147
+[23-May-2026 19:44:45 UTC] PHP Warning:  Undefined array key "bank_details" in /home/kevin/Downloads/q/api/index.php on line 151
