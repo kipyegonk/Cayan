@@ -954,15 +954,39 @@ const app = {
 
   renderCatalog() {
     const items = this.state.catalog || [];
-    return `<div style="max-width:900px;">
+    const CATEGORIES = ['Tents & Structures','Flowers & Décor','Lighting','Furniture','Catering','Logistics','Audio Visual','Miscellaneous'];
+    const UNITS = ['pcs','set','day','hr','table','chair','per person','lot','m²','kg'];
+    return `<div style="max-width:1000px;">
       <div class="page-header">
         <div><h2 class="page-title">Catalog</h2><p class="page-subtitle">${items.length} items</p></div>
         <button class="button" id="cat-add-btn">+ Add Item</button>
       </div>
-      <div class="card">
+      <div class="card" style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Name</th><th>Category</th><th>Unit</th><th>Actions</th></tr></thead>
-          <tbody>${items.length ? items.map(i => `<tr><td>${i.name}</td><td>${i.category||''}</td><td>${i.unit||''}</td><td><button class="button red" style="padding:4px 10px;font-size:11px;" data-del-catalog="${i.id}">Delete</button></td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px;">No catalog items yet.</td></tr>'}</tbody>
+          <thead><tr>
+            <th>Name</th><th>Category</th><th>Unit</th>
+            <th style="text-align:right;">Cost Price</th>
+            <th style="text-align:right;">Margin %</th>
+            <th style="text-align:right;">Sell Price</th>
+            <th style="text-align:center;">Actions</th>
+          </tr></thead>
+          <tbody>${items.length ? items.map(i => {
+            const cost = parseFloat(i.cost_price||i.amount||0);
+            const margin = parseFloat(i.margin||0);
+            const sell = cost > 0 ? (cost * (1 + margin/100)) : parseFloat(i.unit_price||0);
+            return `<tr>
+              <td><strong>${i.name}</strong>${i.description ? '<br><span style="font-size:11px;color:#6B7280;">'+i.description+'</span>' : ''}</td>
+              <td><span style="background:#EFF6FF;color:#1D4ED8;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">${i.category||'—'}</span></td>
+              <td>${i.unit||'—'}</td>
+              <td style="text-align:right;">${cost>0 ? helpers.fmt(cost) : '—'}</td>
+              <td style="text-align:right;">${margin>0 ? margin+'%' : '—'}</td>
+              <td style="text-align:right;font-weight:700;">${sell>0 ? helpers.fmt(sell) : '—'}</td>
+              <td style="text-align:center;white-space:nowrap;">
+                <button class="button secondary" style="padding:4px 10px;font-size:11px;margin-right:4px;" data-edit-catalog="${i.id}">✏ Edit</button>
+                <button class="button red" style="padding:4px 10px;font-size:11px;" data-del-catalog="${i.id}">🗑 Delete</button>
+              </td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px;">No catalog items yet. Click "+ Add Item" to start.</td></tr>'}</tbody>
         </table>
       </div>
     </div>`;
@@ -970,15 +994,30 @@ const app = {
 
   renderClients() {
     const clients = this.state.clients || [];
-    return `<div style="max-width:900px;">
+    return `<div style="max-width:1000px;">
       <div class="page-header">
         <div><h2 class="page-title">Clients</h2><p class="page-subtitle">${clients.length} clients</p></div>
         <button class="button" id="cli-add-btn">+ Add Client</button>
       </div>
-      <div class="card">
+      <div class="card" style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Contact Person</th><th>Actions</th></tr></thead>
-          <tbody>${clients.length ? clients.map(c => `<tr><td>${c.name}</td><td>${c.email||''}</td><td>${c.phone||''}</td><td>${c.contact_person||''}</td><td><button class="button red" style="padding:4px 10px;font-size:11px;" data-del-client="${c.id}">Delete</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:20px;">No clients yet.</td></tr>'}</tbody>
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Phone</th>
+            <th>Contact Person</th><th>Location</th><th>Address</th>
+            <th style="text-align:center;">Actions</th>
+          </tr></thead>
+          <tbody>${clients.length ? clients.map(c => `<tr>
+            <td><strong>${c.name}</strong></td>
+            <td>${c.email||'—'}</td>
+            <td>${c.phone||'—'}</td>
+            <td>${c.contact_person||'—'}</td>
+            <td>${c.location||'—'}</td>
+            <td>${c.address||'—'}</td>
+            <td style="text-align:center;white-space:nowrap;">
+              <button class="button secondary" style="padding:4px 10px;font-size:11px;margin-right:4px;" data-edit-client="${c.id}">✏ Edit</button>
+              <button class="button red" style="padding:4px 10px;font-size:11px;" data-del-client="${c.id}">🗑 Delete</button>
+            </td>
+          </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px;">No clients yet. Click "+ Add Client" to start.</td></tr>'}</tbody>
         </table>
       </div>
     </div>`;
@@ -1184,29 +1223,102 @@ const app = {
     }
 
     // ── Catalog ───────────────────────────────────────────────────────────────
+    const CATEGORIES = ['Tents & Structures','Flowers & Décor','Lighting','Furniture','Catering','Logistics','Audio Visual','Miscellaneous'];
+    const UNITS = ['pcs','set','day','hr','table','chair','per person','lot','m²','kg'];
+
+    const calcSell = () => {
+      const c = parseFloat(document.getElementById('cat-cost')?.value||0);
+      const m = parseFloat(document.getElementById('cat-margin')?.value||0);
+      const sp = document.getElementById('cat-sell');
+      if (sp) sp.value = (c * (1 + m/100)).toFixed(2);
+    };
+
+    const catModalBody = (item={}) => {
+      const costVal = item.cost_price||item.amount||'';
+      const marginVal = item.margin||'';
+      const sellVal = (item.cost_price && item.margin)
+        ? (parseFloat(item.cost_price||0)*(1+(parseFloat(item.margin||0)/100))).toFixed(2)
+        : (item.unit_price||'');
+      return `
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Item Name</label>
+          <input id="cat-name" class="input-field" placeholder="e.g. Floral chandelier" style="margin:0;" value="${item.name||''}">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="cat-category" class="input-field" style="margin:0;">
+            <option value="">-- Select Category --</option>
+            ${CATEGORIES.map(c => '<option value="'+c+'"'+(item.category===c?' selected':'')+'>'+c+'</option>').join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select id="cat-unit" class="input-field" style="margin:0;">
+            <option value="">-- Select Unit --</option>
+            ${UNITS.map(u => '<option value="'+u+'"'+(item.unit===u?' selected':'')+'>'+u+'</option>').join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cost / Amount (KES)</label>
+          <input id="cat-cost" type="number" min="0" step="0.01" class="input-field"
+            placeholder="0.00" style="margin:0;" value="${costVal}" oninput="calcSell()">
+        </div>
+        <div class="form-group">
+          <label>Margin (%)</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input id="cat-margin" type="number" min="0" max="1000" step="0.1" class="input-field"
+              placeholder="e.g. 30" style="margin:0;flex:1;" value="${marginVal}" oninput="calcSell()">
+            <span style="font-size:13px;color:#6B7280;white-space:nowrap;">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sell Price (auto-calculated)</label>
+          <input id="cat-sell" type="number" min="0" step="0.01" class="input-field"
+            placeholder="0.00" style="margin:0;background:#F0FDF4;font-weight:700;" readonly value="${sellVal}">
+        </div>
+        <div class="form-group full">
+          <label>Description (optional)</label>
+          <textarea id="cat-desc" class="input-field" rows="2" placeholder="Brief description" style="margin:0;">${item.description||''}</textarea>
+        </div>
+      </div>`;
+    };
+    window.calcSell = calcSell;
+
+    const saveCatalogItem = async (close, id=null) => {
+      const name = document.getElementById('cat-name')?.value?.trim();
+      if (!name) { this.notify('Name is required', 'error'); return; }
+      const cost = parseFloat(document.getElementById('cat-cost')?.value||0);
+      const margin = parseFloat(document.getElementById('cat-margin')?.value||0);
+      const payload = {
+        name,
+        category: document.getElementById('cat-category')?.value,
+        unit: document.getElementById('cat-unit')?.value,
+        cost_price: cost,
+        margin: margin,
+        unit_price: cost > 0 ? parseFloat((cost*(1+margin/100)).toFixed(2)) : 0,
+        description: document.getElementById('cat-desc')?.value,
+      };
+      const result = id ? await API.catalog.update(id, payload) : await API.catalog.create(payload);
+      if (result.id || result.success) {
+        this.notify(id ? 'Item updated!' : 'Item added!');
+        close();
+        await this.loadAppData();
+        this.state.view = 'catalog';
+        this.render();
+      } else { this.notify(result.error || 'Failed to save', 'error'); }
+    };
+
     document.getElementById('cat-add-btn')?.addEventListener('click', () => {
-      this.showModal('Add Catalog Item', `
-        <div class="form-grid">
-          <div class="form-group full"><label>Name</label><input id="cat-name" class="input-field" placeholder="Item name" style="margin:0;"></div>
-          <div class="form-group"><label>Category</label><input id="cat-category" class="input-field" placeholder="e.g. Tents, Flowers" style="margin:0;"></div>
-          <div class="form-group"><label>Unit</label><input id="cat-unit" class="input-field" placeholder="e.g. pcs, day, hr" style="margin:0;"></div>
-          <div class="form-group full"><label>Description</label><textarea id="cat-desc" class="input-field" rows="2" placeholder="Optional description" style="margin:0;"></textarea></div>
-        </div>`, async (modal, close) => {
-        const name = document.getElementById('cat-name')?.value?.trim();
-        if (!name) { this.notify('Name is required', 'error'); return; }
-        const result = await API.catalog.create({
-          name,
-          category: document.getElementById('cat-category')?.value,
-          unit: document.getElementById('cat-unit')?.value,
-          description: document.getElementById('cat-desc')?.value,
-        });
-        if (result.id || result.success) {
-          this.notify('Item added!');
-          close();
-          await this.loadAppData();
-          this.state.view = 'catalog';
-          this.render();
-        } else { this.notify(result.error || 'Failed to add item', 'error'); }
+      this.showModal('Add Catalog Item', catModalBody(), (modal, close) => saveCatalogItem(close));
+    });
+
+    document.querySelectorAll('[data-edit-catalog]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.currentTarget.dataset.editCatalog;
+        const item = (this.state.catalog||[]).find(i => String(i.id) === String(id));
+        if (!item) return;
+        this.showModal('Edit Catalog Item', catModalBody(item), (modal, close) => saveCatalogItem(close, id));
       });
     });
 
@@ -1223,31 +1335,65 @@ const app = {
     });
 
     // ── Clients ───────────────────────────────────────────────────────────────
+    const cliModalBody = (c={}) => `
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Client / Company Name</label>
+          <input id="cli-name" class="input-field" placeholder="e.g. Joan Langat" style="margin:0;" value="${c.name||''}">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input id="cli-email" class="input-field" type="email" placeholder="client@email.com" style="margin:0;" value="${c.email||''}">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input id="cli-phone" class="input-field" placeholder="e.g. 0700 000 000" style="margin:0;" value="${c.phone||''}">
+        </div>
+        <div class="form-group">
+          <label>Contact Person</label>
+          <input id="cli-contact" class="input-field" placeholder="Contact person name" style="margin:0;" value="${c.contact_person||''}">
+        </div>
+        <div class="form-group">
+          <label>Location / Area</label>
+          <input id="cli-location" class="input-field" placeholder="e.g. Nairobi, Karen" style="margin:0;" value="${c.location||''}">
+        </div>
+        <div class="form-group full">
+          <label>Full Address</label>
+          <input id="cli-address" class="input-field" placeholder="Street / building / estate" style="margin:0;" value="${c.address||''}">
+        </div>
+      </div>`;
+
+    const saveClient = async (close, id=null) => {
+      const name = document.getElementById('cli-name')?.value?.trim();
+      if (!name) { this.notify('Client name is required', 'error'); return; }
+      const payload = {
+        name,
+        email:          document.getElementById('cli-email')?.value,
+        phone:          document.getElementById('cli-phone')?.value,
+        contact_person: document.getElementById('cli-contact')?.value,
+        location:       document.getElementById('cli-location')?.value,
+        address:        document.getElementById('cli-address')?.value,
+      };
+      const result = id ? await API.clients.update(id, payload) : await API.clients.create(payload);
+      if (result.id || result.success) {
+        this.notify(id ? 'Client updated!' : 'Client added!');
+        close();
+        await this.loadAppData();
+        this.state.view = 'clients';
+        this.render();
+      } else { this.notify(result.error || 'Failed to save client', 'error'); }
+    };
+
     document.getElementById('cli-add-btn')?.addEventListener('click', () => {
-      this.showModal('Add Client', `
-        <div class="form-grid">
-          <div class="form-group full"><label>Client / Company Name</label><input id="cli-name" class="input-field" placeholder="e.g. Joan Langat" style="margin:0;"></div>
-          <div class="form-group"><label>Email</label><input id="cli-email" class="input-field" type="email" placeholder="client@email.com" style="margin:0;"></div>
-          <div class="form-group"><label>Phone</label><input id="cli-phone" class="input-field" placeholder="e.g. 0700 000 000" style="margin:0;"></div>
-          <div class="form-group"><label>Contact Person</label><input id="cli-contact" class="input-field" placeholder="Contact person name" style="margin:0;"></div>
-          <div class="form-group"><label>Address</label><input id="cli-address" class="input-field" placeholder="Address" style="margin:0;"></div>
-        </div>`, async (modal, close) => {
-        const name = document.getElementById('cli-name')?.value?.trim();
-        if (!name) { this.notify('Client name is required', 'error'); return; }
-        const result = await API.clients.create({
-          name,
-          email: document.getElementById('cli-email')?.value,
-          phone: document.getElementById('cli-phone')?.value,
-          contact_person: document.getElementById('cli-contact')?.value,
-          address: document.getElementById('cli-address')?.value,
-        });
-        if (result.id || result.success) {
-          this.notify('Client added!');
-          close();
-          await this.loadAppData();
-          this.state.view = 'clients';
-          this.render();
-        } else { this.notify(result.error || 'Failed to add client', 'error'); }
+      this.showModal('Add Client', cliModalBody(), (modal, close) => saveClient(close));
+    });
+
+    document.querySelectorAll('[data-edit-client]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.currentTarget.dataset.editClient;
+        const client = (this.state.clients||[]).find(c => String(c.id) === String(id));
+        if (!client) return;
+        this.showModal('Edit Client', cliModalBody(client), (modal, close) => saveClient(close, id));
       });
     });
 
