@@ -1078,7 +1078,7 @@ const app = {
   },
 
   bindEvents() {
-    // ── Auth ──────────────────────────────────────────────────────────────────
+    //  Auth 
     document.querySelectorAll('.auth-mode-btn').forEach(b => b.addEventListener('click', (e) => {
       this.state.authMode = e.target.dataset.mode; this.render();
     }));
