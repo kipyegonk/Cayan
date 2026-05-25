@@ -412,7 +412,7 @@ define('SESSION_TIMEOUT', 3600);
    - Consider Redis for session storage
 
 3. **API Optimization**
-   - Paginate large result sets
+   - Paginate large result set
    - Filter queries on backend
    - Use database views for complex queries
 
