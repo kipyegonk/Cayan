@@ -361,7 +361,7 @@ define('SECRET_KEY', 'change-this');
 define('JWT_SECRET', 'change-this');
 
 // Files
-define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
+define('MAX_FILE_SIZE', 5 * 1024 * 1024); 
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 
 // Session
