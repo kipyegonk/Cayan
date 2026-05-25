@@ -39,7 +39,7 @@ class Auth {
 
         $payload = [
             'iat' => time(),
-            'exp' => time() + (7 * 24 * 60 * 60), // 7 days
+            'exp' => time() + (7 * 24 * 60 * 60), 
             'iss' => 'QuoteSystem',
             'user_id' => $userId,
             'email' => $email,
