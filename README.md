@@ -365,7 +365,7 @@ define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 
 // Session
-define('SESSION_TIMEOUT', 3600); // 1 hour
+define('SESSION_TIMEOUT', 3600); 
 ```
 
 ##  Troubleshooting
