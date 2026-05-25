@@ -1095,7 +1095,7 @@ const app = {
       }
     });
 
-    // ── Nav ───────────────────────────────────────────────────────────────────
+    //  Nav 
     document.querySelectorAll('.nav-item').forEach(b =>
       b.addEventListener('click', (e) => this.setView(e.currentTarget.dataset.view)));
     document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
