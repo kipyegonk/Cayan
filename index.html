@@ -1100,7 +1100,7 @@ const app = {
       b.addEventListener('click', (e) => this.setView(e.currentTarget.dataset.view)));
     document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
 
-    // ── Quote preview buttons ─────────────────────────────────────────────────
+    //  Quote preview buttons 
     document.querySelectorAll('[data-preview-quote]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.previewQuote;
