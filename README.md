@@ -361,11 +361,11 @@ define('SECRET_KEY', 'change-this');
 define('JWT_SECRET', 'change-this');
 
 // Files
-define('MAX_FILE_SIZE', 5 * 1024 * 1024); 
+define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 
 // Session
-define('SESSION_TIMEOUT', 3600); 
+define('SESSION_TIMEOUT', 3600); // 1 hour
 ```
 
 ##  Troubleshooting
@@ -412,7 +412,7 @@ define('SESSION_TIMEOUT', 3600);
    - Consider Redis for session storage
 
 3. **API Optimization**
-   - Paginate large result set
+   - Paginate large result sets
    - Filter queries on backend
    - Use database views for complex queries
 

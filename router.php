@@ -1,23 +1,21 @@
 <?php
-// Simple router for PHP built-in server
-$uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$file = __DIR__ . $uri;
+// Router for PHP built-in server: php -S localhost:8000 router.php
 
-// Serve existing files directly
-if ($uri !== '/' && file_exists($file) && !is_dir($file)) {
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Serve real static files as-is (html, js, css, images etc.)
+if ($uri !== '/' && file_exists(__DIR__ . $uri) && !is_dir(__DIR__ . $uri)) {
     return false;
 }
 
-// Explicitly serve index.html for root
-if ($uri === '/' || $uri === '') {
-    echo file_get_contents(__DIR__ . '/index.html');
-    return true;
-}
-
-// Route API requests to api/index.php
-if (strpos($uri, '/api/') === 0 || strpos($uri, '/q/api/') === 0) {
+// Route ALL /api/* requests to api/index.php
+if (preg_match('#^/api(/.*)?$#', $uri, $m)) {
+    $pathInfo = $m[1] ?? '/';
+    $_SERVER['PATH_INFO']   = $pathInfo;
+    $_SERVER['REQUEST_URI'] = $uri . (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : '');
     require __DIR__ . '/api/index.php';
-    return true;
+    exit;
 }
 
-return false;
+// Everything else → serve index.html
+readfile(__DIR__ . '/index.html'); 
