@@ -1,4 +1,4 @@
-// ── Views: Settings ─────────────────────────────────────────────────────────
+// Views: Settings 
 
 Object.assign(app, {
 renderSettings() {

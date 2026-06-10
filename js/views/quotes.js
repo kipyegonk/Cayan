@@ -1,4 +1,4 @@
-// ── Views: New Quote form ─────────────────────────────────────────────────────────
+// Views: New Quote form 
 
 Object.assign(app, {
 renderNewQuote() {

@@ -1,4 +1,4 @@
-// ── Views: Auth, Dashboard, Quotes List ─────────────────────────────────────────────────────────
+// Views: Auth, Dashboard, Quotes List 
 
 Object.assign(app, {
 renderAuth() {

@@ -1,4 +1,4 @@
-// ── Views: Users ─────────────────────────────────────────────────────────
+// Views: Users 
 
 Object.assign(app, {
 renderUsers() {

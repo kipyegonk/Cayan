@@ -1,4 +1,4 @@
-// ── Views: Clients ─────────────────────────────────────────────────────────
+// Views: Clients 
 
 Object.assign(app, {
 renderClients() {

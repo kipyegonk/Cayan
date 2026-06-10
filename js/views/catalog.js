@@ -1,4 +1,4 @@
-// ── Views: Catalog ─────────────────────────────────────────────────────────
+// Views: Catalog 
 
 Object.assign(app, {
 renderCatalog() {
