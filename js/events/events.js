@@ -29,7 +29,7 @@ Object.assign(app, {
   },
 
   bindEvents() {
-    // ── Auth ──────────────────────────────────────────────────────────────────
+    // Auth 
     document.querySelectorAll('.auth-tab, .auth-mode-btn').forEach(b => b.addEventListener('click', (e) => {
       this.state.authMode = e.currentTarget.dataset.mode; this.render();
     }));
