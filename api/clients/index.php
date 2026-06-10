@@ -5,7 +5,7 @@ requireAuth();
 $db = getDB();
 $id = segment(2); // /api/clients/{id}
 
-// ── GET /api/clients  or  /api/clients/{id} ───────────────────────────────────
+// GET /api/clients  or  /api/clients/{id} 
 if (method() === 'GET') {
     if ($id) {
         $stmt = $db->prepare("SELECT * FROM clients WHERE id = ?");
@@ -19,7 +19,7 @@ if (method() === 'GET') {
     }
 }
 
-// ── POST /api/clients ─────────────────────────────────────────────────────────
+// POST /api/clients 
 if (method() === 'POST' && !$id) {
     $b = body();
     $name = trim($b['name'] ?? '');
@@ -42,7 +42,7 @@ if (method() === 'POST' && !$id) {
     ok(['success' => true, 'id' => $newId], 201);
 }
 
-// ── PUT /api/clients/{id} ─────────────────────────────────────────────────────
+// PUT /api/clients/{id} 
 if (method() === 'PUT' && $id) {
     $b = body();
     $name = trim($b['name'] ?? '');
@@ -63,7 +63,7 @@ if (method() === 'PUT' && $id) {
     ok(['success' => true]);
 }
 
-// ── DELETE /api/clients/{id} ──────────────────────────────────────────────────
+// DELETE /api/clients/{id} 
 if (method() === 'DELETE' && $id) {
     $db->prepare("DELETE FROM clients WHERE id = ?")->execute([$id]);
     ok(['success' => true]);
