@@ -1,5 +1,5 @@
-// ── App Core — state, auth, routing, render shell ──────────────
-// ─── App State ────────────────────────────────────────────────────────────────
+// App Core  state, auth, routing, render shell 
+// App State 
 const app = {
   state: {
     page: 'auth', authMode: 'login',
