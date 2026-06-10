@@ -267,7 +267,7 @@ Object.assign(app, {
       });
     });
 
-    // ── Clients ───────────────────────────────────────────────────────────────
+    // Clients 
     const cliModalBody = (c={}) => `
       <div class="form-grid">
         <div class="form-group full">
@@ -342,7 +342,7 @@ Object.assign(app, {
       });
     });
 
-    // ── Users (admin only) ────────────────────────────────────────────────────
+    // Users (admin only) 
     // Change password for any user (admin)
     document.querySelectorAll('[data-change-pwd]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -408,7 +408,7 @@ Object.assign(app, {
       });
     });
 
-    // ── Change own password (Settings page) ──────────────────────────────────
+    // Change own password (Settings page) 
     document.getElementById('change-pwd-btn')?.addEventListener('click', async () => {
       const current = document.getElementById('pwd-current')?.value;
       const np      = document.getElementById('pwd-new')?.value;
@@ -428,8 +428,8 @@ Object.assign(app, {
       } else { this.notify(result.error || 'Failed to update password', 'error'); }
     });
 
-    // ── Settings ──────────────────────────────────────────────────────────────
-    // ── Signature pad setup ────────────────────────────────────────────────────
+    //  Settings 
+    // Signature pad setup 
     const canvas = document.getElementById('sig-pad');
     if (canvas) {
       const ctx = canvas.getContext('2d');
