@@ -476,7 +476,7 @@ Object.assign(app, {
       });
     }
 
-    // ── Remove signature ───────────────────────────────────────────────────────
+    // Remove signature 
     document.getElementById('sig-remove-btn')?.addEventListener('click', async () => {
       const company = { ...this.state.company, signature: '' };
       const result = await API.company.save(company);
@@ -487,7 +487,7 @@ Object.assign(app, {
       }
     });
 
-    // ── Add new T&C point ──────────────────────────────────────────────────────
+    //  Add new T&C point 
     document.getElementById('add-term-btn')?.addEventListener('click', () => {
       const editor = document.getElementById('terms-list-editor');
       const idx = editor.querySelectorAll('.terms-row').length;
@@ -503,7 +503,7 @@ Object.assign(app, {
       div.querySelector('textarea').focus();
     });
 
-    // ── Save all settings ──────────────────────────────────────────────────────
+    // Save all settings 
     document.getElementById('set-save-btn')?.addEventListener('click', async () => {
       const logoFile = document.getElementById('set-logo-file')?.files?.[0];
       const sigFile  = document.getElementById('set-sig-file')?.files?.[0];
