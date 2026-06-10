@@ -46,12 +46,12 @@ Object.assign(app, {
       }
     });
 
-    // ── Nav ───────────────────────────────────────────────────────────────────
+    // Nav 
     document.querySelectorAll('.nav-item').forEach(b =>
       b.addEventListener('click', (e) => this.setView(e.currentTarget.dataset.view)));
     document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
 
-    // ── Quote preview buttons ─────────────────────────────────────────────────
+    // Quote preview buttons 
     document.querySelectorAll('[data-preview-quote]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.previewQuote;
@@ -61,7 +61,7 @@ Object.assign(app, {
       });
     });
 
-    // ── New Quote ─────────────────────────────────────────────────────────────
+    // New Quote 
     if (document.getElementById('nq-items-container')) {
       // Single persistent delegated listener on the container for row events
       const nqContainer = document.getElementById('nq-items-container');
@@ -85,7 +85,7 @@ Object.assign(app, {
 
       document.getElementById('nq-vat')?.addEventListener('input', () => this.calcNewQuoteTotals());
 
-      // ── Catalog search filter ──────────────────────────────────────────────
+      // Catalog search filter 
       document.getElementById('nq-catalog-search')?.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase();
         const sel = document.getElementById('nq-catalog-select');
@@ -98,7 +98,7 @@ Object.assign(app, {
         if (visible.length === 1) sel.value = visible[0].value;
       });
 
-      // ── Add from catalog ───────────────────────────────────────────────────
+      // Add from catalog 
       let rowIdx = 1;
       document.getElementById('nq-catalog-add-btn')?.addEventListener('click', () => {
         const sel = document.getElementById('nq-catalog-select');
@@ -155,7 +155,7 @@ Object.assign(app, {
       this.calcNewQuoteTotals();
     }
 
-    // ── Catalog ───────────────────────────────────────────────────────────────
+    // Catalog 
     const CATEGORIES = ['Tents & Structures','Flowers & Décor','Lighting','Furniture','Catering','Logistics','Audio Visual','Miscellaneous'];
     const UNITS = ['pcs','set','day','hr','table','chair','per person','lot','m²','kg'];
 
