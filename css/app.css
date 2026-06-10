@@ -4,8 +4,8 @@
 :root {
   --navy: #760014;        
   --navy-light: #9a0019;  
-  --blue: #760014;        /* reuse maroon for all primary buttons */
-  --blue-hover: #5a000f;  /* darker maroon on hover */
+  --blue: #760014;        
+  --blue-hover: #5a000f;  
   --gold: #D0A95E;        /* Cayan golden — accent */
   --gold-light: #e8c47a;  /* lighter gold */
   --green: #059669;
