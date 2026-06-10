@@ -1,7 +1,7 @@
-// ── Events: Modal + all bindEvents handlers ────────────────────
+// Events: Modal + all bindEvents handlers 
 
 Object.assign(app, {
-// ── Modal helper ────────────────────────────────────────────────────────────
+// Modal helper 
   showModal(title, bodyHtml, onConfirm, confirmLabel = 'Save') {
     const existing = document.getElementById('app-modal');
     if (existing) existing.remove();
