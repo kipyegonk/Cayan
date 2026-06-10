@@ -1,8 +1,8 @@
-/* ── Cayan Events Ke. — Quote System Styles ──────────────────── */
+/* Cayan Events Ke. — Quote System Styles  */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --navy: #760014;        /* Cayan maroon — primary brand */
+  --navy: #760014;        
   --navy-light: #9a0019;  /* lighter maroon hover */
   --blue: #760014;        /* reuse maroon for all primary buttons */
   --blue-hover: #5a000f;  /* darker maroon on hover */
