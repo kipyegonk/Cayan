@@ -3,7 +3,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
   --navy: #760014;        
-  --navy-light: #9a0019;  /* lighter maroon hover */
+  --navy-light: #9a0019;  
   --blue: #760014;        /* reuse maroon for all primary buttons */
   --blue-hover: #5a000f;  /* darker maroon on hover */
   --gold: #D0A95E;        /* Cayan golden — accent */
