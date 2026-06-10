@@ -5,7 +5,7 @@ requireAuth();
 $db = getDB();
 $id = segment(2); // /api/catalog/{id}
 
-// ── GET /api/catalog  or  /api/catalog/{id} ───────────────────────────────────
+// GET /api/catalog  or  /api/catalog/{id} 
 if (method() === 'GET') {
     if ($id) {
         $stmt = $db->prepare("SELECT * FROM catalog WHERE id = ?");
@@ -19,7 +19,7 @@ if (method() === 'GET') {
     }
 }
 
-// ── POST /api/catalog ─────────────────────────────────────────────────────────
+// POST /api/catalog 
 if (method() === 'POST' && !$id) {
     $b    = body();
     $name = trim($b['name'] ?? '');
@@ -46,7 +46,7 @@ if (method() === 'POST' && !$id) {
     ok(['success' => true, 'id' => $db->lastInsertId()], 201);
 }
 
-// ── PUT /api/catalog/{id} ─────────────────────────────────────────────────────
+// PUT /api/catalog/{id} 
 if (method() === 'PUT' && $id) {
     $b    = body();
     $name = trim($b['name'] ?? '');
@@ -73,7 +73,7 @@ if (method() === 'PUT' && $id) {
     ok(['success' => true]);
 }
 
-// ── DELETE /api/catalog/{id} ──────────────────────────────────────────────────
+// DELETE /api/catalog/{id} 
 if (method() === 'DELETE' && $id) {
     $db->prepare("DELETE FROM catalog WHERE id = ?")->execute([$id]);
     ok(['success' => true]);
