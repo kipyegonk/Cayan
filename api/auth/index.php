@@ -5,7 +5,7 @@ $action = segment(1); // auth/login → login
 
 switch ($action) {
 
-    // ── POST /api/auth/login ──────────────────────────────────────────────────
+    // POST /api/auth/login 
     case 'login':
         if (method() !== 'POST') err('Method not allowed', 405);
         $b = body();
@@ -40,7 +40,7 @@ switch ($action) {
             ],
         ]);
 
-    // ── POST /api/auth/register ───────────────────────────────────────────────
+    // POST /api/auth/register 
     case 'register':
         if (method() !== 'POST') err('Method not allowed', 405);
         $b    = body();
@@ -63,7 +63,7 @@ switch ($action) {
 
         ok(['success' => true, 'message' => 'Registration submitted. Await admin approval.']);
 
-    // ── GET /api/auth/verify ──────────────────────────────────────────────────
+    // GET /api/auth/verify 
     case 'verify':
         if (method() !== 'GET') err('Method not allowed', 405);
         $user = requireAuth();
